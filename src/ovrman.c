@@ -12,17 +12,17 @@
 
 
 
-  Quick overfiew:
+  Quick overview:
   * 16bit x86 machines were limited by 640K RAM
   * Large porition of program's code runs just once, and is not required
     majority of the time.
   * Overlays are a method to load code into a buffer inside these 640K, run it,
-    and then discard, freeing memory for new code.
+    and then discard, freeing memory for other use.
   * Overlay manager is responsible for doing that seamlessly to the programmer,
     with the cooperation of the compiler. I.e. instead of direct calls,
-    compiler calls to the overlay manager, which uses compiler provided data
-    to load and relocate the overlays.
-  * Borland's VROOMM iwas part of the Borland C++ compiler's runtime,
+    compiler generates calls to the overlay manager, which uses
+    the compiler provided data to load and relocate the overlays.
+  * Borland's VROOMM was part of the Borland C++ compiler's runtime,
     residing inside the OVERLAY.LIB.
     VROOMM allowed fine grained overlay loading to support object oriented code.
     Among its features was the ability to unload the calling overlay, by walking
@@ -37,7 +37,7 @@
     which runs __OvrPrepare in this file, before initializing the standard
     C library and passing control to the main().
     Given that this code uses only the __farmalloc from the C library,
-    while the rest of library can be compiled as overlays.
+    the rest of library can be compiled as overlays.
 */
 
 
