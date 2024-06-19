@@ -1,0 +1,75 @@
+_longjmp..........SETJMP            _setjmp...........SETJMP
+__BootHandler.....OVRDAT            __CALLEMSEXIT.....OVRDATA
+__CALLEXTEMSSWAP..OVRDATA           __CALLEXTEXIT.....OVRDATA
+__CHECKOVERLAY....OVRMAN            __CHECKSTACK......OVRMAN
+__DGROUP..........OVRMAN            __EmsChecked......OVRDAT
+__EmsFirstPage....OVRDAT            __EmsHandle.......OVRDAT
+__EmsPageFrame....OVRDAT            __EmsPages........OVRDAT
+__EmsRec..........OVRDAT            __EmsVersion......OVRDAT
+__EXITEMS.........OVRDETEC          __EXITEXT.........OVRDETEC
+__ExtChecked......OVRDAT            __EXTCOPY.........OVRDETEC
+__ExtEndAddress...OVRDAT            __EXTGDT..........OVRDAT
+__ExtRec..........OVRDAT            __ExtStartAddress..OVRDAT
+__FakeVdisk.......OVRDAT            __FAR_RETURN......OVRHP
+__INITEMS.........OVRDETEC          __INITEMSPAGE.....OVRDETEC
+__INITEXT.........OVRDETEC          __INITEXTMEM......OVRDETEC
+__InitModules.....OVRMAN            __ISOVERLAYMOD....OVRMAN
+__OverlayHalt.....OVRHALT           __OVRBACKLINK__...OVRDATA
+__ovrbuffer.......OVRBUFF           __OvrCodeList.....OVRDATA
+__OvrDosHandle....OVRDATA           __OVREXIT.........OVRMAN
+__OvrFileBase.....OVRDATA           __OVRFILENAME.....OVRDATA
+__OVRGROUP........OVRMAN            __OvrHeapEnd......OVRDATA
+__OvrHeapOrg......OVRDATA           __OvrHeapPtr......OVRDATA
+__OVRHOOK__.......OVRDATA           __OVRINIT.........OVRMAN
+__OvrInitEms......OVRSWAP           __OvrInitExt......OVRSWAP
+__OvrLoadCount....OVRDATA           __OvrLoadList.....OVRDATA
+__OvrMemorySwap...OVRDATA           __OvrMinHeapSize..OVRDATA
+__OvrPrepare......OVRUSER           __OvrProbation....OVRDATA
+__OvrRetrySize....OVRDATA           __OvrSize.........OVRDATA
+__OvrTrapCount....OVRDATA           __OVRTRAP__.......OVRDATA
+__ReadOvrDisk.....OVRMAN            __SwapOverlay.....OVRSWAP
+__XmsBase.........OVRDAT            __XmsControl......OVRDAT
+__XMSGDT..........OVRDAT            __XmsHandle.......OVRDAT
+
+
+OVRMAN            Offset: 00000010H  Code and data size: 8edH
+  __CHECKOVERLAY    __CHECKSTACK      __DGROUP          __InitModules
+  __ISOVERLAYMOD    __OVREXIT         __OVRGROUP        __OVRINIT
+  __ReadOvrDisk   
+
+OVRSWAP           Offset: 00001040H  Code and data size: 43dH
+  __OvrInitEms      __OvrInitExt      __SwapOverlay   
+
+OVRUSER           Offset: 00001a20H  Code and data size: 67H
+  __OvrPrepare    
+
+OVRDETEC          Offset: 00001df0H  Code and data size: 4d9H
+  __EXITEMS         __EXITEXT         __EXTCOPY         __INITEMS
+  __INITEMSPAGE     __INITEXT         __INITEXTMEM    
+
+OVRHALT           Offset: 00002990H  Code and data size: 34H
+  __OverlayHalt   
+
+OVRDAT            Offset: 00002b00H  Code and data size: b1H
+  __BootHandler     __EmsChecked      __EmsFirstPage    __EmsHandle
+  __EmsPageFrame    __EmsPages        __EmsRec          __EmsVersion
+  __ExtChecked      __ExtEndAddress   __EXTGDT          __ExtRec
+  __ExtStartAddress                   __FakeVdisk       __XmsBase
+  __XmsControl      __XMSGDT          __XmsHandle     
+
+OVRDATA           Offset: 00002fb0H  Code and data size: b0H
+  __CALLEMSEXIT     __CALLEXTEMSSWAP  __CALLEXTEXIT     __OVRBACKLINK__
+  __OvrCodeList     __OvrDosHandle    __OvrFileBase     __OVRFILENAME
+  __OvrHeapEnd      __OvrHeapOrg      __OvrHeapPtr      __OVRHOOK__
+  __OvrLoadCount    __OvrLoadList     __OvrMemorySwap   __OvrMinHeapSize
+  __OvrProbation    __OvrRetrySize    __OvrSize         __OvrTrapCount
+  __OVRTRAP__     
+
+OVRHP             Offset: 000034a0H  Code and data size: 1H
+  __FAR_RETURN    
+
+OVRBUFF           Offset: 00003560H  Code and data size: 2H
+  __ovrbuffer     
+
+SETJMP            Offset: 00003640H  Code and data size: b7H
+  _longjmp          _setjmp         
