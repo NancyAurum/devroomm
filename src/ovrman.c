@@ -27,9 +27,10 @@
     VROOMM allowed fine grained overlay loading to support object oriented code.
     Among its features was the ability to unload the calling overlay, by walking
     and patching the program's stack frames.
-  * VROOMM was used in several video games, among them the 1993 game Stronghold,
-    a fantasy city management game. And the 1993 Nomad game, a space exploration
-    and trading game.
+  * VROOMM was used in several video games, among them: 
+    * The 1993 game Stronghold, a fantasy city management game.
+    * The 1993 Nomad game, a space exploration and trading game.
+    * Might and Magic III, an RPG game with puzzles.
     In general the presence of VROOMM can be detected by the letters "FBOV",
     and the string "Runtime overlay error".
   * The execution of the program starts at C0.OBJ (see c0.c),
