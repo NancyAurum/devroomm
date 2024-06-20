@@ -99,10 +99,12 @@ typedef struct { //Borland file header
 #define FBOV_OVR   2
 #define FBOV_DATA  4
 typedef struct { //borland overlay segment entry
-  uint16_t seg;    // segment (coincides with the MZ reloc table segments)
-  uint16_t maxoff; // -1 - Ignored by the linker's OvrCodeReloc
+  uint16_t seg;    // Segment (coincides with the MZ reloc table segments)
+  uint16_t maxoff; // Maximum offset inside that segment
+                   // 0xFFFF - Ignored by the linker's OvrCodeReloc
   uint16_t flags;  // FBOV_CODE,FBOV_OVR,FBOV_DATA
-  uint16_t minoff;
+  uint16_t minoff; // Minimum offset inside that segment,
+                   // I.e. when the data/code doesn't begin on the paragrapsh
 } PACKED boseg_t;
 
 
@@ -124,7 +126,7 @@ typedef struct { //Overlay header record, defined in RTL/INC/SE.ASM
                           //   In EXE the table is located just after the code.
                           //   The pointers are relative to the bufseg,
                           //   and each is uint16_t.
-  uint16_t jmpcnt;        //0C number of fbov_trmp_t to update on load
+  uint16_t jmpcnt;        //0C number of bojmp_t to update on load
                           //   the jumps are located just after this header
   uint16_t link;          //0E backlink?
   //Following are the OvrMan houskeeping fields.
@@ -142,8 +144,21 @@ typedef struct { //Overlay header record, defined in RTL/INC/SE.ASM
                           //   decremented in the __OvrAllocateSpace
                           //1C user[2:3] __OvrLoadList, points to next heap segh
                           //1E user[4:5] also a segment
-  //fbov_trap_t dispatch[]; //switch table
+  //botrp_t dispatch[]; //switch table
 } PACKED bosh_t;
+
+typedef struct { //trapped jmp, which overlay manager turns into a normal one
+                 //on the first entry
+  uint8_t code[2]; //int 3Fh (0xCD 0x3F)
+  uint16_t ofs;    //offset inside the overlay
+  uint8_t pad;     //unused
+} PACKED botrp_t;
+
+typedef struct { //trampouline to an overlayed function
+                 //which rplaces botrp_t on overlay activation
+  uint8_t code; //  0xEA (jmp far)
+  far_t dst;    
+} PACKED bojmp_t;
 
 #define UserNext(segh) *(uint16_t*)((segh)->user + 2)
 
@@ -201,7 +216,7 @@ uint8_t __BootHandler[];
 
 //_OVRDATA_ (fourth segment, compiler/linker generated stuff):
 
-//Linker generated segments table, same as the one inside FBOV
+//Linker generated segments table, bofh_t.stofs points to it
 extern boseg_t __SEGTABLE__[];
 extern boseg_t __SEGTABEND__[];
 char *__EXENAME__ = "st.exe"; //original exename made by linkier
@@ -274,7 +289,7 @@ void __OvrFixupFunref(uint16_t rseg, uint16_t ptr, uint16_t seg) {
 
   uint16_t rofs = sizeof(bosh_t);
 
-  //go through the fbov_trap_t entries
+  //go through the botrp_t entries
   for ( ; fofs != *(uint16_t*)&q[rofs+2]; rofs += 5);
   
   *(uint16_t*)&p[4] = rofs; //relocate the offset part of the far function ptr
@@ -308,11 +323,11 @@ void __OvrDoFixups(bosh_t *segh, uint16_t fixupsz) {
 #define X86_JMP 0xEA
 void __OvrUntrapJmps(bosh_t *segh) {
   uint16_t bufseg = segh->bufseg;
-  fbov_trap_t *trap = (fbov_trap_t*)(segh+1);
+  botrp_t *trap = (botrp_t*)(segh+1);
   uint16_t remain = segh->jmpcnt;
   do {
-    uint16_t ofs = trap->dst;
-    fbov_trmp_t *trmp = trap++;
+    uint16_t ofs = trap->ofs;
+    bojmp_t *trmp = trap++;
     trmp->code = X86_JMP;
     trmp->dst.ofs = ofs;
     trmp->dst.seg = bufseg;
@@ -348,7 +363,7 @@ dos_read_t __OvrInitReadSegs() {
     seg = SEG2PTR(__OvrLoadList);
 
     do { //relocate segments
-      if (seg->fixupsz) __OvrDoFixups(seg);
+      if (seg->fixupsz) __OvrDoFixups(seg, seg->fixupsz);
       if (seg->jmpcnt) __OvrUntrapJmps(seg);
       bosh_t *bseg = SEG2PTR(seg->bufseg-1);
       bseg->link = seg;
@@ -386,31 +401,6 @@ void __OvrAddToLoadList(bosh_t *segh) {
 }
 
 
-#define BOSH_UNLISTED 0xFF
-
-int __InitModules() {
-  //save pointer to the parent's break handler's segment
-  ovr_parent_breakhndlr_seg = &_psp->breakhndlr.seg;
-
-  uint16_t min_size = 0;
-  boseg_t *pse = __SEGTABLE__;
-  do {
-    if ((pse->flags & FBOV_OVR) && pse->maxoff) {
-      bosh_t *segh = SEG2PTR(pse->seg);
-      __OvrCodeList = pse->seg;
-      if (segh->user[0] == BOSH_UNLISTED) __OvrCodeList = 0; //not loaded
-      else {
-        // Set overlay loader routine and relocate the overlay offset
-        segh->ems_ofs = &__ReadOvrDisk;
-        segh->fileofs += __OvrFileBase;
-        uint16_t sz = __OvrCalcSize(segh); //calculate the ovelray size
-        if (min_size < sz) min_size = sz;
-      }
-    }
-  } while (++pse < __SEGTABEND__);
-  __OvrMinHeapSize = min_size + 2; //adding 2 accomodates for alignment
-  return 0;
-}
 
 
 //Installs handler for the VROOMM interrupts (usually 0x3f)
@@ -594,13 +584,38 @@ bad_file:
   return INIT_OKAY;
 }
 
+#define BOSH_UNLISTED 0xFF
+
+int __InitModules() {
+  //save pointer to the parent's break handler's segment
+  ovr_parent_breakhndlr_seg = &_psp->breakhndlr.seg;
+
+  uint16_t min_size = 0;
+  boseg_t *pse = __SEGTABLE__;
+  do {
+    if ((pse->flags & FBOV_OVR) && pse->maxoff) {
+      bosh_t *segh = SEG2PTR(pse->seg);
+      __OvrCodeList = pse->seg;
+      if (segh->user[0] == BOSH_UNLISTED) __OvrCodeList = 0; //not loaded
+      else {
+        // Set overlay loader routine and relocate the overlay offset
+        segh->ems_ofs = &__ReadOvrDisk;
+        segh->fileofs += __OvrFileBase;
+        uint16_t sz = __OvrCalcSize(segh); //calculate the ovelray size
+        if (min_size < sz) min_size = sz;
+      }
+    }
+  } while (++pse < __SEGTABEND__);
+  __OvrMinHeapSize = min_size + 2; //adding 2 accomodates for alignment
+  return 0;
+}
+
 void __OVREXIT() {
   if (__OvrDosHandle != 0) __OvrResetInterruptVector();
   __CALLEMSEXIT(GETREG(CS));
   __CALLEXTEXIT(GETREG(CS));
   return;
 }
-
 
 void __OvrPrepare() {
   __InitModules();
