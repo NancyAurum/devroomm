@@ -1,6 +1,6 @@
 /*
   MZap
-  A command line utility to process the DOS MZ executbables.
+  A command line utility to process the DOS MZ executables.
   Doesn't work with PE EXEs.
   
   If you just want to prepare your Borland FBOV .exe for Ghidra, then do,
