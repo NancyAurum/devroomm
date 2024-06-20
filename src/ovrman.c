@@ -276,7 +276,7 @@ void __OvrFixupFunref(uint16_t rseg, uint16_t ptr, uint16_t seg) {
   //Check the MOD part of the MODRM byte
   //it does some opcode magic, since 0x50 is both `push AX`
   //and when masked by 0xF8 is a general `push <register>` group
-  //Same with 0xB8, which usually `mov AX,<imm16>` and an opcode group
+  //Same with 0xB8, which is both `mov AX,<imm16>` and an opcode group
   if ((p[-1]&X86_MOD) != X86_MOV_IMM16) return; //moves segment?
   if ((p[ 2]&X86_MOD) != X86_PUSH) return;
   if ((p[-1]&X86_RM) != (p[2]&X86_RM)) return; //same RM operand?

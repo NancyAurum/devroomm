@@ -127,27 +127,7 @@ typedef struct { //borland overlay segment entry
   uint16_t minoff; // Minimum offset inside that segment,
                    // I.e. when the data/code doesn't begin on the paragrapsh
 } PACKED boseg_t;
-/*
 
-int32_t __OvrInitModule(bosh_t * bohdr) {
-  CL = 4;
-  AX = bohdr->size;
-  AX += 0x11;
-  AX >>= CL;
-  DX = bohdr-reltblsz;
-  DX += 0xF;
-  DX <<= 4;
-  return DX;
-}
-
-RU16(p,o) *(uint16_t*)((p)+(o))
-int32_t __OvrInitModule(uint8_t * ES) {
-  //(reltblsz+0xF)*16 + (size+0x11)/16;
-  return (RU16(ES,0xA)+0xF)*16 + (RU16(ES,0x8)+0x11)/16;
-}
-
-
-*/
 
 typedef struct { //Overlay header record, defined in RTL/INC/SE.ASM
   uint8_t  code[2];       //00 int 3Fh (0xCD 0x3F) overlay manager interrupt
@@ -267,7 +247,7 @@ void usage() {
 
 #if 0
 void __OvrFixupFunref(uint16_t rseg, uint8_t *p) {
-  //ptr at the fixup location
+  //p - pointer at the fixup location
 
 
   //segment inside which the fixup location does a function call
