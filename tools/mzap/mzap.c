@@ -1,9 +1,17 @@
 /*
   MZap
-  A command line utility to process the DOS MZ files.
-  Doesn't work with PE.
+  A command line utility to process the DOS MZ executbables.
+  Doesn't work with PE EXEs.
   
   If you just want to prepare your Borland FBOV .exe for Ghidra, then do,
+
+    ./mzap.exe fbov.exe -mb ./out/unfbov.exe
+
+  That produces unfbov.exe, which has the FBOV section merged into the
+  normal executable, which should work with both Ghidra and IDA Pro.
+  With some tricks it should be possible to run and debug it too.
+
+  If that method fails, then try
 
     ./mznfo.exe fbov.exe -r 0x10000 ./out/unfbov.exe
 
@@ -226,10 +234,8 @@ void usage() {
   P("  -lr                 List relocation table entries\n");
   P("  -lb                 List Borland's FBOV __SEGTABLE__\n");
   P("  -lbh                List borland FBOV headers\n");
-#if 0
-  P("  -mb                 Merge Borland overlays into the MZ .exe\n");
+  P("  -mb                 Merge Borland FBOV section into the core MZ\n");
   P("                      The resulting exe can be loaded into Ghidra\n");
-#endif
   P("  -r <base>           Relocate executable to <base> before dump.\n");
   P("                      Allows to calculate additional info.\n");
   P("                      <base> should be aligned to 16bytes.\n");
@@ -281,6 +287,10 @@ void __OvrFixupFunref(uint16_t rseg, uint8_t *p) {
 }
 #endif
 
+
+#define FIXUP_FUNREF 0x1
+#define X86_JMP 0xEA
+
 int main(int argc, char **argv) {
   int i;
   int do_reloc = 0;
@@ -307,8 +317,19 @@ int main(int argc, char **argv) {
   NAP_IF("lr") list_reloc_table = 1; NAP_FI
   NAP_IF("lb") list_fbov = 1; NAP_FI
   NAP_IF("lbh") list_bosh = 1; NAP_FI
-  //NAP_IF("mb") merge_fbov = 1; NAP_FI
+  NAP_IF("mb") merge_fbov = 1; NAP_FI
   NAP_OUTRO(1,2)
+
+  char *outpath;
+  int outfolder = 0;  
+  if (fargc >= 2) {
+    outpath = fargv[1];
+    if (outpath[strlen(outpath)-1] == '/') outfolder = 1;
+    if (!outfolder && path_is_folder(outpath)) {
+      outfolder = 1;
+      outpath = cat(outpath,"/");
+    }
+  }
 
   if (!file_exists(fargv[0])) fail("File doesn't exist: %s", fargv[0]);
   
@@ -349,7 +370,7 @@ int main(int argc, char **argv) {
   //SS is usually at the end of everything, so
   //if (h->ss) loaded_sz = h->ss*16 + start_ofs; 
 
-  printf("* Loaded size: %dB\n", loaded_sz);
+  printf("* Size of the MZ section loaded by DOS: %dB\n", loaded_sz);
   if (loaded_sz > file_size) {
     printf("  That is more than the file size!\n");
     loaded_sz = file_size;
@@ -357,6 +378,9 @@ int main(int argc, char **argv) {
 
 
   printf("* Can allocate from %dB up to %dB\n",h->minalloc*16,h->maxalloc*16);
+  if (h->minalloc > h->maxalloc)
+    printf("  minalloc > maxalloc!!!\n");
+
   int topload = 0;
   if (!h->minalloc && !h->maxalloc) {
     topload = 1;
@@ -428,9 +452,17 @@ int main(int argc, char **argv) {
 
   spr = (far_t*)(file+h->lfarlc);
   epr = spr + h->crlc;
+  //fprintf(stderr, "Processign the reloactiong table\n");
   for (pr = spr; pr < epr; pr++) {
     seg_refs[pr->seg]++;
     int linear = start_ofs + pr->seg*16 + pr->ofs;
+    if (linear > file_size) {
+      printf("!!!Relocation is out of bounds, %04X:%04X!!!\n"
+            , pr->seg, pr->ofs);
+      printf("Halting.\n");
+      return 0;
+    }
+    //fprintf(stderr, "%04X:%04X\n", pr->seg, pr->ofs);
     uint16_t word = *(uint16_t*)(file+linear);
     seg_trefs[word]++;
   }
@@ -491,6 +523,7 @@ int main(int argc, char **argv) {
       if (pbs->flags&FBOV_OVR) boc++;
     }
   }
+
 
 #if 1
   if (is_fbov && list_fbov) {
@@ -559,7 +592,114 @@ int main(int argc, char **argv) {
   }
 
 
-  if (do_reloc && is_fbov) {
+  if (merge_fbov) {
+    if (!is_fbov) {
+      printf("Couldn't find the FBOV section\n");
+      return 0;
+    }
+    if (fargc < 2) {
+      printf("No output file specified\n");
+      return 0;
+    }
+
+    printf("Preparing the FBOV-MZ merge...\n");
+    far_t *relocs = 0;
+    for (pr = spr; pr < epr; pr++) arrput(relocs, *pr);
+    //int linear = start_ofs + pr->seg*16 + pr->ofs;
+    //*(uint16_t*)(file+linear) += reloc;
+
+#if 1
+    printf("Untrapping the FBOV stub headers...\n");
+    for (pbs = sbst; pbs < ebst; pbs++) { //untrap trampoulines
+      if (!(pbs->flags&FBOV_OVR)) continue;
+      int linear = start_ofs + pbs->seg*16;
+      bosh_t *bo = (bosh_t *)(file+linear);
+      botrp_t *trp = (botrp_t*)(bo+1);
+
+      int cofs32 = fbovofs+16+bo->fileofs;
+      uint8_t *p = file + cofs32; //segments code
+      cofs32 -= start_ofs;
+      int cseg = (cofs32&0xFFFF0) >> 4; //code segment
+      int cdisp = cofs32&0xF; //displacement
+
+      for (i = 0; i < bo->jmpcnt; i++) {
+        uint16_t ofs = trp->ofs;
+        bojmp_t *trmp = (bojmp_t *)trp++;
+        trmp->code = X86_JMP;
+        trmp->dst.ofs = ofs + cdisp;
+        trmp->dst.seg = cseg;
+        far_t ptr;
+        ptr.seg = pbs->seg;
+        ptr.ofs = (uint8_t*)&trmp->dst.seg - file - linear;
+        arrput(relocs, ptr);
+      }
+    }
+#endif
+
+#if 1
+    printf("Rebasing FBOV fixups...\n");
+    for (pbs = sbst; pbs < ebst; pbs++) { //relocate
+      if (!(pbs->flags&FBOV_OVR)) continue;
+      int linear = start_ofs + pbs->seg*16;
+      bosh_t *bo = (bosh_t *)(file+linear);
+
+      int cofs32 = fbovofs+16+bo->fileofs;
+      uint8_t *p = file + cofs32; //segments code
+      cofs32 -= start_ofs;
+      int cseg = (cofs32&0xFFFF0) >> 4; //code segment
+      int cdisp = cofs32&0xF; //displacement
+
+      //FBOV fixups are stored after the segment's code
+      uint16_t *q = (uint16_t*)(p + bo->codesz);
+      for (i = 0; i < bo->fixupsz/2; i++) {
+        uint8_t *pp = &p[q[i]];
+        int sf = *(uint16_t*)pp;
+        int flags = sf&7; //fixup flags
+        int rseg = sbst[sf>>3].seg;
+        *(uint16_t*)pp = rseg;
+        far_t ptr;
+        ptr.ofs = pp - p + cdisp;
+        ptr.seg = cseg;
+        //printf("%04X:%04X\n", ptr.seg, ptr.ofs);
+        arrput(relocs, ptr);
+        if (flags&FIXUP_FUNREF) {
+          printf("FIXME: merge function reference reloc!!!\n");
+          //__OvrFixupFunref(rseg,*(uint8_t*)&p[q[i]]);
+        }
+      }
+    }
+#endif
+
+    //printf("%d\n", file_size-start_ofs);
+    h->crlc = arrlen(relocs);
+    int new_cparhdr = h->lfarlc + (int32_t)h->crlc*4;
+    h->cparhdr = (new_cparhdr+15)/16;   
+    int hdrpadsz = (int32_t)(new_cparhdr+15)/16*16 - new_cparhdr;
+    int new_file_size = h->cparhdr*16 + file_size-start_ofs;
+    h->cp = (new_file_size+MZ_PGSZ-1)/MZ_PGSZ;
+    h->cblp = new_file_size%MZ_PGSZ;
+
+    printf("Dumping to %s..\n", outpath);
+    FILE *fo = fopen(outpath, "wb");
+    fwrite(file, 1, h->lfarlc, fo);
+
+    for (i = 0; i < arrlen(relocs); i++) {
+      //fprintf(stderr, "%04X:%04X\n", relocs[i].seg, relocs[i].ofs);
+      fwrite(&relocs[i], 1, 4, fo);
+    }
+    if (hdrpadsz) {   //pad relocation table to paragraph size
+      uint8_t pad[16];
+      memset(pad, 0, hdrpadsz);
+      fwrite(pad, 1, hdrpadsz, fo);
+    }
+    fbov->id[0] = 0; //otherwise IDA will treat it as a valid FBOV
+    fbov->id[1] = 0;
+    fwrite(file+start_ofs, 1, file_size-start_ofs, fo);
+
+    fclose(fo);
+
+
+#if 0
     printf("Relocating the FBOV section...\n");
     for (pbs = sbst; pbs < ebst; pbs++) { //relocate
       if (!(pbs->flags&FBOV_OVR)) continue;
@@ -570,7 +710,6 @@ int main(int argc, char **argv) {
 
       //FBOV fixups are stored after the segment's code
       uint16_t *q = (uint16_t*)(p + bo->codesz);
-#define FIXUP_FUNREF 0x1
       for (i = 0; i < bo->fixupsz/2; i++) {
         int sf = *(uint16_t*)&p[q[i]];
         int flags = sf&7; //fixup flags
@@ -589,7 +728,50 @@ int main(int argc, char **argv) {
       int linear = start_ofs + pbs->seg*16;
       bosh_t *bo = (bosh_t *)(file+linear);
       botrp_t *trp = (botrp_t*)(bo+1);
-#define X86_JMP 0xEA
+      for (i = 0; i < bo->jmpcnt; i++) {
+        uint16_t ofs = trp->ofs;
+        bojmp_t *trmp = (bojmp_t *)trp++;
+        trmp->code = X86_JMP;
+        trmp->dst.ofs = ofs;
+        int memofs = fbovofs+16+bo->fileofs - start_ofs + base;
+        trmp->dst.seg = (memofs+15)/16;
+      }
+    }
+#endif
+    printf("Done!\n");
+    return 0;
+  }
+
+
+  if (do_reloc && is_fbov) {
+    printf("Relocating the FBOV section...\n");
+    for (pbs = sbst; pbs < ebst; pbs++) { //relocate
+      if (!(pbs->flags&FBOV_OVR)) continue;
+      int linear = start_ofs + pbs->seg*16;
+      bosh_t *bo = (bosh_t *)(file+linear);
+
+      uint8_t *p = file + fbovofs+16+bo->fileofs; //segments code
+
+      //FBOV fixups are stored after the segment's code
+      uint16_t *q = (uint16_t*)(p + bo->codesz);
+      for (i = 0; i < bo->fixupsz/2; i++) {
+        int sf = *(uint16_t*)&p[q[i]];
+        int flags = sf&7; //fixup flags
+        int rseg = sbst[sf>>3].seg + reloc;
+        *(uint16_t*)&p[q[i]] = rseg;
+        if (flags&FIXUP_FUNREF) {
+          printf("FIXME: relocate function reference\n");
+          //__OvrFixupFunref(rseg,*(uint8_t*)&p[q[i]]);
+        }
+      }
+    }
+
+    printf("Untrapping the FBOV stub headers...\n");
+    for (pbs = sbst; pbs < ebst; pbs++) { //untrap trampoulines
+      if (!(pbs->flags&FBOV_OVR)) continue;
+      int linear = start_ofs + pbs->seg*16;
+      bosh_t *bo = (bosh_t *)(file+linear);
+      botrp_t *trp = (botrp_t*)(bo+1);
       for (i = 0; i < bo->jmpcnt; i++) {
         uint16_t ofs = trp->ofs;
         bojmp_t *trmp = (bojmp_t *)trp++;
@@ -612,8 +794,8 @@ int main(int argc, char **argv) {
     fbov->id[1] = 0;
   }
 
-  printf("Relocating normal MZ section...\n");
   if (do_reloc) {
+    printf("Relocating normal MZ section...\n");
     for (pr = spr; pr < epr; pr++) {
       int linear = start_ofs + pr->seg*16 + pr->ofs;
       //uint16_t ofs = *(uint16_t*)(file+linear);
@@ -626,14 +808,6 @@ int main(int argc, char **argv) {
   }
 
   if (fargc < 2) return 0;
-
-  char *outpath = fargv[1];
-  int outfolder = 0;
-  if (outpath[strlen(outpath)-1] == '/') outfolder = 1;
-  if (!outfolder && path_is_folder(outpath)) {
-    outfolder = 1;
-    outpath = cat(outpath,"/");
-  }
 
   if (!outfolder) {
     printf("Dumping to %s..\n", outpath);
