@@ -1,0 +1,76 @@
+Microsofts linker (LINK) can create single EXE files containing multiple overlays (up to 63) which are simply numbered in sequence. The first in sequence is always 0 and the one loaded as program if executed directly by DOS. Each Overlay within the file is essentially an EXE file (structure) with it's own MZ header.
+
+Runtime support is not provided by DOS' EXEC, but an (often) language specific Overlay Manager which may or may not use DOS' Load Overlay function. Link replaces all calls to a function in an overlay other than the one executed by an INT call (default 3Fh) followed by overlay number and entry point.
+
+The whole process is described in great detail (from a linker's perspective) in the _The MS DOS Encyclopedia; Article 20: The Microsoft Object Linker; Overlays p.715ff.
+https://archive.org/details/The_MS-DOS_Encyclopedia_Ray_Duncan/page/714/mode/2up?q=%22Overlay%20Manager%22
+
+
+The Details
+______________
+Ever wondered why huge programs like WORD can run on memory tight PCs and still hold considerable data in access? Overlays it is. Instead of the whole program only it's main and maybe most common used routines are loaded into memory. Everything else is only loaded on demand. Kind of a user space swapping. By arranging code according to usage (and maybe duplicating some) these loads could be kept in check that even working from diskettes was acceptable.
+
+Using overlays was the way of executing larger programs than main memory (or the memory assigned) in the time before virtual memory (*1). DOS as a real memory OS, intended for small machines was from the start made to support this. Except, to keep DOS itself small, the code to fully manage overlays was not included. DOS only supports to load the first overlay from an EXE file. Depending on the function used for loading this would be either handled as a regular program, or as overlay.
+
+Programs could use this to have overlays loaded into their 'overlay area' by using DOS function 4Bh/03h Load Overlay - to make it work every overlay had to be kept in a separate file.
+
+Then again, the EXE format was on purpose created in a way to support multiple chunks of 'content', like additional information, precreated data or more general any form of resource. Such resource would be simply added added to the EXE file after the program. Usually at a 512 byte boundary, using the word at offset 4h of the EXE-header as linkage pointer. Microsoft used this in two cases, adding debug information and supporting multiple overlays in a single file. Both managed by LINK, Microsoft's linker.
+
+A program (A) with two overlays (B,C)(*2) can be linked by marking them as such with parenthesis:
+
+LINK A+(B)+(C)
+
+will produce an EXE file with three overlays with according overlay numbers:
+
+0. Program A (Main)
+1. Overlay B
+2. Overlay C
+
+When executing this, only the Program A will be loaded into memory. All references in either of the three to any overlay other than the own will not be marked up in the relocation table, but replaced by the linker into a sequence of
+
+        INT    3Fh
+        DB     <overlay number (1,2)
+        DW     <offset function address>
+
+The interrupt to be used can be changed with the linker option /O:int#. Usually the program (A) will be linked also with an overlay manager which intercepts that interrupt and use the following values to perform the needed transition:
+
+* The INT is invoked,
+* the active Overlay is noted on stack
+* the overlay manager looks up the requested overlay number,
+  * if not loaded:
+    * the new Overlay is loaded (*3)
+    * it's number is recorded as active
+* a CALL to the offset within the overlay is performed
+
+When returning the process runs in reverse:
+* Execution returns to the overlay manager
+* previous Overlay number is poped from stack
+* if not loaded:
+  * that Overlay is loaded (*4)
+* its number is recorded as active
+* return address on stack is incremented by 3
+* an IRET is executed.
+
+It's easy to see that specialized overlay managers could as well have more than one overlay in memory a any time. Given only if installed memory permits this :))
+The Other Way
+
+Borland did as well offer some overlay managers. In fact there seem to have been at least 3 different versions.
+
+  * One private version build into Turbo Pascal 2.0 that worked the same way
+    under CP/M and DOS (all within a single 64 Ki segment)
+  * A third party "Overlay Manager for Turbo Pascal" by Turbopower Software
+    for Turbo Pascal 3.0 which seemed to have used INT 3Fh as well.
+  * And VROOM (Virtual Realtime Object Oriented Memory *4), delivered with
+    Turbo Pascal 6. It was way more sophisticated and supported use of
+    XMS/EMS memory for extrem fast witching of small sized overlays.
+    Described in great detail in this article.
+
+*1 - In fact, it's, as Puppydrumm64 reminds, a strategy well known by console programmers as well. After all, Games had as well a tendency to grow larger than the available ROM address space, so rather sophisticated schemes of bank switching were developed ... essentially hardware supported overlay managers :))
+
+*2 - Sure each of A/B/C can consist of multiple object files, left that out for simplicity.
+
+*3 - Yes, that's exactly the point where that overlay number in the EXE header is used: the overlay manager walks the file (*5) until it finds the requested number noted at offset 1Ah.
+
+*4 Thanks to Jerry Coffin for remembering the name ... I only recalled it being something like ZOOM :)
+
+*5 - Ok, any overlay manager worth its money will only walk it once and note the offsets in a table for faster access, wouldn't it?

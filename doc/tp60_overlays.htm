@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=0.86, maximum-scale=3.0, minimum-scale=0.86" name="viewport">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+
+<title>
+      julian m bucknall &gt;&gt; The Slithy Tove
+    </title>
+
+<style>
+
+/* ==========================================================================
+   Author - kenny Williams  // hirekenny.com.au
+   ========================================================================== */
+
+body { font-size: 1em; line-height: 1.4;  padding-bottom: 4em; }
+::-moz-selection { background: #b3d4fc; text-shadow: none; }
+::selection { background: #b3d4fc; text-shadow: none; }
+.chromeframe { margin: 0.2em 0; background: #ccc; color: #000; padding: 0.2em 0;}
+img { vertical-align: middle; border: none; }
+a{ text-decoration: none; }
+ol, ul{ margin: 0; padding: 0; }
+body {-webkit-font-smoothing: antialiased; font-smooth: always; text-shadow: 1px 1px 1px rgba(0,0,0,0.004); font: 16px/24px 'robotoregular'; }
+code, pre { font-family: "Inconsolata", "Consolas", "Courier New", Courier, monospace; font-size: 1.0em; }
+.wrapper { width: 800px; margin: 0 auto; }
+
+
+
+/* ==========================================================================
+   Theme Colours
+   ========================================================================== */
+body{
+   	background: #f3f4f5;  /* Background for Site */
+}
+html, button, input, select, textarea { 
+	color: #656a6f; /* General Body Text Color*/
+}
+a {
+	color: #151a7F;
+}
+.main ul li:before, h1 span, h2 span, h3 span, h4 span, .highlight, h5, h6, h1:after, h2:after, h3:after, .main-container a:hover, 
+.more:before, ol > li:before, .cta a:hover, .error[generated=true], .footable.breakpoint > tbody > tr > td.expand:before, 
+.byline {
+	color: #ffc000; /* Feature Color*/
+}   
+a.btn, input[type=button], nav a.active, input[type=submit]{
+	background-color: #ffc000; /* Button Back Ground Color*/
+	color: #fff; /* Button Text Color*/
+}
+a.btn:hover, input[type=button]:hover, nav a:hover, input[type=submit]:hover{
+	background-color: #646d72; /* Button Back Ground Color on Hover*/
+	color: #fff;
+}
+h1, h2, h3, h4, .nav a, h1 a, h2 a, h3 a, h4 a, #response .success, .success:before, #response .failure{
+	color: #2d3438; /* Headings Color*/
+} 
+strong, b, .lead, .main table th, blockquote, .more, .cta a{
+	color: #3c4a52; /* Headings Color*/
+}
+#masthead{
+	background: #a4aeb0!important; /* Home Page Masthead Background Color - Match to image*/
+}
+.cta, .cta h1, .cta h2, .cta h4, .cta h5{
+	color: #fff; /* Masthead Headings Color*/
+}
+.cta h3{
+	color: #e2e2e2; /* Masthead Headings Color*/
+}
+
+
+
+/* ==========================================================================
+   Logos
+   ========================================================================== */  
+.logo{
+	max-width: 131px; /* Update width to suite your own logo size */
+}
+.logo-foot{
+	max-width: 45px; /* Update width to suite your own logo size */
+}
+
+
+
+
+	
+
+/* ==========================================================================
+   Masthead Styles
+   ========================================================================== */
+#masthead{
+	display: block;
+	height: 1050px;
+}
+
+.cta h1{
+	font-family: 'robotoblack';
+	font-size: 96px;
+	margin-bottom: 15px;
+	letter-spacing: -2px;
+}
+.cta h3{
+	font-family: 'aleoitalic';
+	letter-spacing: 0;
+}
+.cta h1:after, .cta h2:after, .cta h3:after {
+	content: none;
+}
+.cta{
+	margin-top: 18%;
+	padding-bottom: 30px;
+	font-size: 18px;
+}
+.cta a{
+	-webkit-transition: all 250ms ease-in-out;
+	-moz-transition: all 250ms ease-in-out;
+	-ms-transition: all 250ms ease-in-out;
+	-o-transition: all 250ms ease-in-out;
+	transition: all 250ms ease-in-out;
+}
+
+
+
+
+/* ==========================================================================
+   Main Navigation Styles
+   ========================================================================== */
+
+.logo{
+	display: inline-block;
+	float: left;
+}   
+.logo img, .logo-foot img{
+	width: 100%;
+}   
+.header-container nav{
+	float: right;
+	margin-top: 10px;
+}
+.header-container .nav li{
+	float: left;
+	position: relative;
+	padding: .4em .4em;
+}
+.nav a{
+	font-family: 'robotobold_condensed';
+	font-size: 20px;
+	padding: 0.3em 1.2em;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	white-space: nowrap;
+	-webkit-transition: all 250ms ease-in-out;
+	-moz-transition: all 250ms ease-in-out;
+	-ms-transition: all 250ms ease-in-out;
+	-o-transition: all 250ms ease-in-out;
+	transition: all 250ms ease-in-out;
+}
+.tinynav { 
+	display: none; 
+	width: 100%;
+	margin-top: .5em;
+	margin-bottom: .6em;
+}
+
+
+
+/* ==========================================================================
+   Main Container General Layout Styles
+   ========================================================================== */
+.header-container header{
+	padding-top: 60px;
+	border-bottom: 1px solid #cad2d7;
+	padding-bottom: 45px;
+}   
+.main-container{
+	padding: 50px 0;
+}
+.main-content{
+	width: 65%;
+	float: left;
+}
+.main-content.full{
+	width: 100%;
+	float: none;
+}
+.main-content pre{
+	max-width: 100%;width: 100%;
+	background: #d7dce3;
+	border: 1px solid #000;
+	margin: 1em 0;
+	padding: 10px;
+	overflow: auto;
+	max-height: 500px;
+	word-wrap: normal;
+	white-space: pre;
+	-webkit-box-sizing: border-box;
+	    -moz-box-sizing: border-box;
+	    box-sizing: border-box;
+}
+.main-content img, .right-aside img{
+	max-width: 100%;width: 100%;
+	background: #d7dce3;
+	border: 6px solid #fff;
+	margin: 1em 0;
+	-webkit-box-sizing: border-box;
+	    -moz-box-sizing: border-box;
+	    box-sizing: border-box;
+}
+a img{
+	-webkit-transition: all 250ms ease-in-out;
+	-moz-transition: all 250ms ease-in-out;
+	-ms-transition: all 250ms ease-in-out;
+	-o-transition: all 250ms ease-in-out;
+	transition: all 250ms ease-in-out;
+	opacity: 1;
+	position: relative;
+}
+a img:hover{
+	opacity: .6;
+}
+.right-aside{
+	float: right;
+	width: 24%;
+	border-left: 1px solid #cad2d7;
+	padding-left: 4%;
+}
+.right-aside img{
+	width: 100%;
+}
+.main-content figcaption {
+	font-style: italic;
+	font-size: smaller;
+}
+.nugget {
+	background-color: white;
+	padding: 10px;
+	border: 1px solid #969ca5;
+	margin-right: 0 !important;
+}
+.nogrow {
+	width: auto !important; 
+}
+
+
+/* ============= Columns ===============*/ 
+.half{
+	width: 47%;
+	margin-right: 6%;
+	float: left;
+}
+.third{
+	width: 30%;
+	margin-right: 5%;
+	float: left;
+}
+.fourths{
+	width: 22%;
+	margin-right: 4%;
+	float: left;
+}
+.two-third, .cta.two-third{
+	width: 65%;
+	margin-right: 5%;
+	float: left;
+}
+.three-fourths{
+	width: 74%;
+	margin-right: 4%;
+	float: left;
+}
+.left{
+	float: left;
+}
+.right{
+	float: right;
+	margin-left: 4%;
+}
+
+
+
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+h1, h2, h3, h4, h5, h6, p{
+	word-wrap: break-word;
+}   
+h1, h2, h3, h4, h5, h6{ 
+	font-weight: normal;
+	line-height: 100%;
+	letter-spacing: -1px;
+	margin: 25px 0 .5em;
+}
+h1{
+	font-size: 66px;
+}
+h2{
+	font-size: 36px;
+	margin-top: 15px;
+}
+h3{
+	font-size: 28px;
+}
+h4, h5{
+	font-size: 24px;
+}
+h6, byline {
+	font-size: 14px;
+	letter-spacing: 0px;
+	position: relative;
+}
+h6.meta, blockquote h6{
+	top: -1.4em;
+}
+strong, h1, h2, h3, h4, h5, h6, b, .more, ol > li:before, .cta a{
+	font-family: 'robotobold';
+	font-weight: normal;
+}
+h1:after, h2:after, h3:after{
+	content: ".";
+	font-size: 56px;
+	position: relative;
+	padding-left: 3px;
+}
+em{ 
+	font-style: normal;
+	font-family: 'robotoitalic'; 
+}
+.lead, blockquote{
+	font-size: 24px;
+	line-height: 32px;
+	font-family: 'aleoitalic';
+}
+.lead{
+	margin-top: 0;
+}
+
+.main-container a{
+	-webkit-transition: all 250ms ease-in-out;
+	-moz-transition: all 250ms ease-in-out;
+	-ms-transition: all 250ms ease-in-out;
+	-o-transition: all 250ms ease-in-out;
+	transition: all 250ms ease-in-out;
+	cursor: pointer;
+}
+
+
+hr { display: block; height: 1px; border: 0; border-top: 1px solid #cad2d7; padding: 0; margin: 3em 0; }
+hr.dash { display: block; height: 1px; border: 0; border-top: 1px dashed #cad2d7; margin: 3em 0; padding: 0; }
+hr.dots { display: block; height: 1px; border: 0; border-top: 1px dotted #cad2d7; margin: 3em 0; padding: 0; }
+
+
+iframe{
+	margin-top: 1em;
+	margin-bottom: 1em;
+	padding: 1%;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	background-color: #fff;
+	width: 98%;
+}
+.fluid-width-video-wrapper{
+	margin-bottom: 1em;
+	background-color: #ffffff;
+}
+.fluid-width-video-wrapper iframe{
+	width: 100%;
+	padding: 0;
+	margin: 0;
+}
+
+
+blockquote, blockquote.right, blockquote.left{
+	margin: 0 3% 3%;
+}
+
+blockquote div {
+	font-size: 16px;
+	line-height: 24px;
+}
+
+
+/* ============= Lists ===============*/   
+.main ul, .main ol{
+	margin-bottom: 12px;
+}   
+.main ul li, .more{
+	list-style-type: none;
+	line-height: 20px;
+	padding-top: 5px;
+	padding-bottom: 8px;
+	position: relative;
+	padding-left: 22px;
+}
+
+.main ul li:before, .more:before{
+	content: "g";
+	font-family: 'bulletsregular';
+	font-size: 16px;
+	left: 3px;
+	top: 6px;
+	position: absolute;
+}
+.main ol{
+	margin-left: 22px;
+}
+ol {
+    counter-reset:li; /* Initiate a counter */
+    margin-left:0; /* Remove the default left margin */
+    padding-left:0; /* Remove the default left padding */
+}
+ol > li {
+    position:relative; /* Create a positioning context */
+    list-style:none; /
+	margin: 0 0 0 1em;
+	padding-top: 3px;
+	padding-bottom: 5px;
+	padding-left: 0px;
+}
+ol > li:before {
+    content:counter(li) "."; /* Use the counter as content */
+    counter-increment:li; /* Increment the counter by 1 */
+    position:absolute;
+    top:-2px;
+    left:-1.5em;
+    -moz-box-sizing:border-box;
+    -webkit-box-sizing:border-box;
+    box-sizing:border-box;
+    width:1.5em;
+    margin-right:8px;
+    padding:4px;
+    text-align:center;
+}
+li ol,li ul {margin-top:6px;}
+ol ol li:last-child {margin-bottom:0;}
+
+
+
+
+/* ============= Buttons ===============*/
+a.btn, input[type=button], input[type=submit]{
+	border: none;
+	color: #fff;
+	font-weight: normal;
+	font-size: 18px;
+	font-family: 'robotobold';
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	padding: .6em 1.2em;
+	white-space: nowrap;
+	display: inline-block;
+	-webkit-transition: all 250ms ease-in-out;
+	-moz-transition: all 250ms ease-in-out;
+	-ms-transition: all 250ms ease-in-out;
+	-o-transition: all 250ms ease-in-out;
+	transition: all 250ms ease-in-out;
+	margin-bottom: .5em;
+	margin-top: .5em;
+}
+a.btn:hover{
+	color: #fff;
+}
+a.small-btn{
+	font-size: 14px;
+	padding: .4em .9em;
+}
+a.xsmall-btn{
+	font-size: 12px;
+	padding: .2em .7em;
+}
+
+
+
+/* ============= Tables ===============*/
+.main table{
+	border: 1px solid #dde1e5;	
+	text-align: left;
+	width: 100%;
+	background: #ffffff;
+}
+.main table th{
+	padding: .5em;
+	border: 1px solid #dde1e5;
+	background-color: #ebedef;
+	vertical-align: top;	
+}
+.main table td{
+	padding: .5em;
+	border: 1px solid #dde1e5;
+	vertical-align: top;	
+}
+.main table tr:nth-child(2n+1){
+	background-color: #f8f8f8;
+}
+.main table td.actor {
+	text-align: right;
+}
+.main table td.actor, .main table td.role {
+	border-left: none;
+	border-right: none;
+}
+
+
+
+
+/* ============= Forms ===============*/
+form{
+	margin-top: 3em;
+}
+fieldset{
+	padding: 1em;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	border: 1px solid #d9d6cf;
+	margin-bottom: 1em;
+}
+fieldset fieldset{
+	background: #ffffff;
+}
+label{
+	font-weight: normal;
+	font-family: 'robotobold';
+	padding-right: 1em;
+	display: block;
+}
+input[type=text],  input[type=email], input[type=password], textarea{
+ 	border: 1px solid #dde1e5;
+	background: #ffffff;
+	padding: 10px 2%;
+	font-family: 'robotolight_italic';
+	color: #969ca5;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	display: inline-block;
+	outline: none;
+	margin-bottom: 1em;
+	resize: none;
+	display: block;
+	width: 68%;
+	-webkit-appearance: none;
+}
+ input[type=text]:focus, textarea:focus, input[type=email]:focus, input[type=password]:focus{
+ 	border: 1px solid #efdca2;
+ }
+textarea{
+	width: 96%;
+	height: 140px;
+	display: block;
+	resize: none;
+	outline: none;
+}
+select, input[type=radio], input[type=checkbox] {
+	margin-bottom: 1em;
+	margin-right: 6px;
+}
+.error[generated=true] {
+	font-size: 14px;
+	font-family: 'robotoitalic';
+}
+
+
+
+
+/* ==========================================================================
+   Footer Styles
+   ========================================================================== */
+				
+footer .wrapper{
+	font-size: 14px;
+	color: #9fa6aa;
+	border-top: 1px solid #cad2d7;
+	padding: 50px 0 50px;
+	margin-top: 20px;
+}
+.logo-foot{
+	display: inline-block;
+	padding-right: 5px;
+}
+.social-link{
+	width: 31px;
+	opacity: .4;
+	display: inline-block;
+	-webkit-transition: all 250ms ease-in-out;
+	-moz-transition: all 250ms ease-in-out;
+	-ms-transition: all 250ms ease-in-out;
+	-o-transition: all 250ms ease-in-out;
+	transition: all 250ms ease-in-out;
+}					
+.social-link img{
+	width: 100%;
+}
+.social-link:hover{
+	opacity: 1;
+}
+
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+
+.right-aside p {
+	font-size: small;
+	line-height: normal;
+}
+
+.clearboth {
+	clear: both;
+}
+
+.codeKeyword {
+	color: #0000ff;
+}
+
+.codeType {
+	color: #2b91af;
+}
+
+.codeNum {
+	color: #ff0000;
+}
+
+.codeString {
+	color: #ff00ff;
+}
+
+.codePunct {
+	color: #808000;
+}
+
+.codeBkGrnd {
+	background-color: #ffff00;
+}
+
+
+/* ==========================================================================
+   Media Queries 480
+   ========================================================================== */
+@media only screen and (max-width: 480px) { 
+	 input[type=text],  input[type=email], input[type=password], textarea, a.btn, input[type=button], input[type=submit]{
+		padding: 10px 2%;
+		width: 96%;
+	}
+	a.btn, input[type=button]{
+		text-align: center;
+	}
+	a.small-btn{
+		font-size: 14px;
+		padding: .4em 2%;
+	}
+	a.xsmall-btn{
+		font-size: 12px;
+		padding: .2em 2%;
+	}
+	iframe{
+		max-height: 320px;
+	}
+	
+}
+
+
+
+/* ==========================================================================
+   Media Queries 600
+   ========================================================================== */
+@media only screen and (max-width: 600px) { 
+
+	.logo{
+		float: none;
+		padding-bottom: 20px;
+	}
+	.header-container nav{
+		float: none;
+	}
+	select.tinynav{
+		width: 100%;
+	}
+	.main-content img{
+		width: 100%;
+	}
+	.backstretch{
+		opacity: 0.2;
+	}
+	.cta.two-third{
+		width: 100%;
+		margin-right: 0%;
+		float: none;
+	}
+
+	
+	/* ============= Tables ===============*/
+		.main table{ 
+			border-left: 1px solid #cad2d7;
+			border-right: 1px solid #cad2d7;
+			border-top: none;
+			border-bottom: none;
+		}	
+}
+
+
+/* ==========================================================================
+   Media Queries 768
+   ========================================================================== */
+@media only screen and (max-width: 768px) {
+	.tinynav { 
+		display: block; 
+	}
+	#nav{ 
+		display: none; 
+	}	
+	#masthead{
+		display: block;
+		height: 100%;
+	}
+	.cta h1{
+		font-size: 72px;
+	}
+	
+	/* ============= Main Container General Layout Styles===============*/
+	.header-container header{
+		padding: 30px 0 25px;
+		text-align: center;
+	} 
+	.main-content, .right-aside{
+		width: 100%;
+		float: none;
+		border: none;
+		padding-left: 0;
+		padding-right: 0;
+	}
+	.main-container{
+		padding: 25px 0 50px;
+	}
+	.right-aside{
+		border-top: 1px solid #cad2d7;
+		margin-top: 25px; 
+	}
+	/* ============= Columns ===============*/ 
+	.third, .half, .fourths, .two-third, ol.icon-lists li, ul.flag-lists li, .three-fourths, .foot.left, .foot.right{
+		width: 100%;
+		margin-right: 0%;
+		float: none;
+	}
+	.third, .half, .fourths, .two-third, .three-fourths{
+		margin-bottom: 30px;
+	}
+	blockquote.third, blockquote.half, blockquote.fourths, blockquote.two-third{
+		width: 100%;
+	}
+	blockquote, blockquote.right, blockquote.left{
+		margin: 0;
+	}
+	.foot.left, .foot.right{
+		display: block;
+		text-align: center;
+		margin-bottom: 50px;
+	}
+	
+ }
+ 
+
+ 
+/* ==========================================================================
+   Media Queries 870 (was 1140)
+   ========================================================================== */  
+@media only screen and (max-width: 870px) { 
+	.wrapper { width: 92%; margin: 0 4%; }
+}
+
+
+
+
+
+
+
+
+
+
+
+/* ==========================================================================
+   FONTS
+   ========================================================================== */
+   
+@font-face {
+    font-family: 'aleoitalic';
+    src: url('../font/aleo-italic-webfont.eot');
+    src: url('../font/aleo-italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/aleo-italic-webfont.woff') format('woff'),
+         url('../font/aleo-italic-webfont.ttf') format('truetype'),
+         url('../font/aleo-italic-webfont.svg#aleoitalic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+@font-face {
+    font-family: 'bulletsregular';
+    src: url('../font/bullets-webfont.eot');
+    src: url('../font/bullets-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/bullets-webfont.woff') format('woff'),
+         url('../font/bullets-webfont.ttf') format('truetype'),
+         url('../font/bullets-webfont.svg#bulletsregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'robotoblack';
+    src: url('../font/roboto-black-webfont.eot');
+    src: url('../font/roboto-black-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/roboto-black-webfont.woff') format('woff'),
+         url('../font/roboto-black-webfont.ttf') format('truetype'),
+         url('../font/roboto-black-webfont.svg#robotoblack') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+@font-face {
+    font-family: 'robotobold';
+    src: url('../font/roboto-bold-webfont.eot');
+    src: url('../font/roboto-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/roboto-bold-webfont.woff') format('woff'),
+         url('../font/roboto-bold-webfont.ttf') format('truetype'),
+         url('../font/roboto-bold-webfont.svg#robotobold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+@font-face {
+    font-family: 'robotobold_condensed';
+    src: url('../font/roboto-boldcondensed-webfont.eot');
+    src: url('../font/roboto-boldcondensed-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/roboto-boldcondensed-webfont.woff') format('woff'),
+         url('../font/roboto-boldcondensed-webfont.ttf') format('truetype'),
+         url('../font/roboto-boldcondensed-webfont.svg#robotobold_condensed') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+@font-face {
+    font-family: 'robotoitalic';
+    src: url('../font/roboto-italic-webfont.eot');
+    src: url('../font/roboto-italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/roboto-italic-webfont.woff') format('woff'),
+         url('../font/roboto-italic-webfont.ttf') format('truetype'),
+         url('../font/roboto-italic-webfont.svg#robotoitalic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+
+
+@font-face {
+    font-family: 'robotolight_italic';
+    src: url('../font/roboto-lightitalic-webfont.eot');
+    src: url('../font/roboto-lightitalic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/roboto-lightitalic-webfont.woff') format('woff'),
+         url('../font/roboto-lightitalic-webfont.ttf') format('truetype'),
+         url('../font/roboto-lightitalic-webfont.svg#robotolight_italic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+
+
+@font-face {
+    font-family: 'robotoregular';
+    src: url('../font/roboto-regular-webfont.eot');
+    src: url('../font/roboto-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/roboto-regular-webfont.woff') format('woff'),
+         url('../font/roboto-regular-webfont.ttf') format('truetype'),
+         url('../font/roboto-regular-webfont.svg#robotoregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+
+
+
+
+/* ==========================================================================
+   Helper classes
+   ========================================================================== */
+
+.clearfix:before, .clearfix:after { content: " "; display: table; }
+.clearfix:after { clear: both; }
+.clearfix { *zoom: 1; }
+.last{ margin-right: 0!important; padding-right: 0!important; border-right: none!important; }
+.first{ margin-left: 0!important; padding-left: 0!important; border-left: none!important; }
+.tableless, .tableless th, .tableless tr, .tableless td{
+	background: none!important;
+	border: none!important;
+	padding: 0px!important;
+}
+
+
+/* ==========================================================================
+   Print styles
+   ========================================================================== */
+
+@media print {
+* { background: transparent !important; color: #000 !important; box-shadow:none !important; text-shadow: none !important;}
+a, a:visited { text-decoration: underline; }
+a[href]:after { content: " (" attr(href) ")";}
+abbr[title]:after { content: " (" attr(title) ")"; }
+.ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after { content: ""; }
+img { max-width: 100% !important; page-break-inside: avoid; }
+
+@page { margin: 0.5cm; }
+p, h2, h3 { orphans: 3; widows: 3; }
+h2, h3 { page-break-after: avoid; }
+}
+
+</style>
+
+
+  </head>
+
+  <body>
+
+    <!-- Start Main Body -->
+    <div class="main-container">
+      <div class="main wrapper clearfix">
+
+        <!-- Start Main Content -->
+        <div class="main-content full">
+          <div class="clearfix">
+
+            <h2>The Slithy Tove</h2>
+            <h6 class="meta">
+              published: 
+              Wed, 13-Aug-2003
+              &nbsp;&nbsp;|&nbsp;&nbsp;
+              updated: Sat, 6-Aug-2016
+            </h6>
+
+            
+              <span class="right last">
+                <img>
+              </span>       
+            
+
+            <p>
+...did gyre and gimble in the wabe. If that's how you thought Turbo 
+Pascal's overlay manager did its job, Julian Bucknall takes his vorpal 
+sword in hand, and guides you through its unchartered territory.
+</p>
+<h4>
+Asides from the future
+</h4>
+<p>
+This article was the very first I ever wrote and got published. I got the idea for it from a huge real-mode 
+program I'd been developing, and, after contacting <cite>.EXE Magazine</cite> to say that I had this possible 
+subject for an article, were they interested, etc, the editor Will Watts persuaded me to finish it and submit 
+it. The article you see here was exactly as submitted (all I've done is to remove the wierd embedded tags they 
+needed for publishing, cast it into HTML, and write these asides). As it happened, its relevancy didn't last 
+that long: it was written for Turbo Pascal 6.0 and when Borland Pascal 7.0 came out with protected mode 
+support it made all these overlay shenanigans moot. 
+</p>
+<p>
+(Notes for browser watchers: the caption for table 1 has been specified in my CSS file as to be displayed along 
+the bottom of the table. Mozilla Firebird gets it right, but Internet Explorer 6 seems to ignore CSS2's
+<code>caption-side</code> property and leaves the caption along the top.)
+</p>
+<p>
+<cite>.EXE</cite> (rhymes with <cite>not sexy</cite> as it used to say on the masthead) finally died in August 
+2000 and the circulation list was bought by <cite>Dr Dobbs Journal</cite>. I am eternally grateful to Will 
+Watts for giving me my first opportunity to write for a magazine.
+</p>
+<p>
+This article originally appeared in <cite>.EXE Magazine</cite> in February 1992.
+</p>
+<h4>
+Introduction
+</h4>
+<p>
+There are two alternative beginnings to this article: choose the one you believe (a bit like <cite>The French Lieutenant's Woman</cite> in reverse).
+</p>
+<p>
+The first was when I was recently composing a internal memo on how Turbo
+ Pascal V6.0 used memory to overlay my application's code. I blithely 
+wrote something like `...and the code is switched in from EMS in chunks 
+of 2KB to 5KB...', when I stopped. How did I know how big my overlaid 
+units were? With Turbo Pascal's smart linker stripping out unused 
+procedures, functions and methods the code size reported by TPC (the 
+command line compiler) was no help. The MAP file gave me information I 
+didn't believe (the overlaid units looked miles too small); the manual 
+is silent on the subject.
+</p>
+<p>
+The second story was a program crash. My error handler from hell gave me
+ the address of the failing statement: bang in the middle of my overlay 
+buffer. Yeah, well, thanks and everything, but which routine in which 
+overlaid unit was crashing at that location? I mention in passing that 
+the application has about 100 overlays, and more Turbo Vision spaghetti 
+than Italy.
+</p>
+<p>
+So what was I to do? I needed more information on the overlay system. I 
+picked up the Turbo Pascal manual, dusted off Turbo Debugger, and 
+descended into virtual 8086 mode.
+</p>
+<h4>
+Basics
+</h4>
+<p>
+Overlays are a method of fitting a very large program into a restricted 
+area of memory. Part of the program is compiled into a separate overlay 
+file, and a clever overlay manager pulls in code blocks from this file 
+into a common buffer when they are needed. A code block which is no 
+longer being used can be discarded in favour of another code block. The 
+overlay system in Turbo Pascal V6.0 is very easy to implement (a couple 
+of switch settings and some code preamble to set up the manager), and 
+even has some rudimentary tuning parameters to help it run more 
+smoothly.
+</p>
+<p>
+I shall be describing the overlay system as implemented in Turbo Pascal 
+V5.5 and V6.0 (they are the same); I no longer have V5.0 and so am 
+unable to check whether the following is substantially true or not. I 
+would recommend at this point that you read the Turbo Pascal manuals on 
+the overlay system (for V5.5 see the <cite>Reference Guide</cite> and the <cite>OOP Guide</cite>, for V6.0 see the <cite>Programmer's Guide</cite>);
+ I shall assume from now on that you have a good knowledge of the 
+overlay system as described officially by Borland. I'm afraid I shall 
+have to assume some rudimentary assembly language knowledge as well.
+</p>
+<p>
+But don't be disheartened. By the end of this article, you will have a 
+more thorough understanding of the overlay system, and be able to track 
+overlaid units being loaded, put on probation, discarded, and also to 
+access the overlay manager's data on each overlaid unit.
+</p>
+<h4>
+In at the shallow end
+</h4>
+<p>
+First point of attack is all those undocumented identifiers, described 
+oh so tersely in the manuals. I present a review of the undocumented 
+identifiers in Table 1, together with any extra information I've gleaned
+ on the official ones. Before looking at it, I must introduce a 
+definition. You all know what the segment part of an address refers to 
+(the offset in paragraphs from the start of memory), well the overlay 
+manager uses another type of segment value, one that is measured from 
+the start of the program code itself. Every time one of these segment 
+values is used, it has to be translated (relocated) to the absolute 
+segment form. This is easy: just add the Program Segment Prefix segment 
+(PrefixSeg) and the size of the PSP in paragraphs ($10). I shall call 
+this unrelocated segment a locale; this conjures up a mental image of 
+the words local and address so it shouldn't be to difficult to remember 
+(if it catches on, you heard it in .EXE first!).
+</p>
+<div class="codebackground">
+<table>
+<tbody><tr>
+<td>
+<code>OvrReadBuf</code>
+</td>
+<td>
+(Procedure variable)
+</td>
+<td>
+Allows you to intercept overlay load operations by writing your own read
+ routine. Documented a bit in the manual. Fairly handy, in that you 
+could, for example, write a routine to load overlays that have been 
+compressed, or that reside in XMS. Although it is documented which 
+overlay is required (parameter <code>OvrSeg</code> is just the segment 
+of the unit stub block, described in the text), where is goes and 
+whether any fix-up exercise has to be done is totally undocumented (the 
+answers are at <code>ubsBufferSeg</code>, and yes!). <code>OvrInitEMS</code> replaces the standard loader with its own.
+</td>
+</tr>
+<tr>
+<td>
+<code>OvrCodeList</code>
+</td>
+<td>
+(Word)
+</td>
+<td>
+The manual calls this the `Overlay code segment list'. This is a 
+`locale' (defined in the text), and it points to the first unit stub 
+block. The unit stub blocks form a chain which you can `walk' to get 
+information about any overlay unit. The main text describes this in 
+detail.
+</td>
+</tr>
+<tr>
+<td>
+<code>OvrLoadList</code>
+</td>
+<td>
+(Word)
+</td>
+<td>
+The `Loaded overlays list'. Again a locale, but this points to the first
+ overlay stub block whose code is currently loaded somewhere in the 
+overlay buffer. These stub blocks form a chain which you can `walk' to 
+get information about any unit that is currently loaded. In other words,
+ it provides the map of the overlay buffer. The unit code block pointed 
+to by this variable is the `oldest' unit in the overlay buffer and will 
+be the first to be removed, ie it's the tail of the ring buffer.
+</td>
+</tr>
+<tr>
+<td>
+<code>OvrDebugPtr</code>
+</td>
+<td>
+(Pointer)
+</td>
+<td>
+The `Overlay debugger hook'. Used by the overlay manager to tell Turbo 
+Debugger that it has just completed a probation trap or unit load 
+operation. This should be a far procedure with no parameters. ES is the 
+unit stub block segment, BX the offset of the called routine in the unit
+ code block.
+</td>
+</tr>
+<tr>
+<td>
+<code>OvrHeapSize</code>
+</td>
+<td>
+(Word)
+</td>
+<td>
+The `Initial overlay buffer size'. True, but it's quoted in paragraphs not bytes (cf <code>OvrGetBuf</code>).
+</td>
+</tr>
+<tr>
+<td>
+<code>OvrHeapPtr</code>
+</td>
+<td>
+(Word)
+</td>
+<td>
+The `Overlay buffer pointer'. This segment value actually points to the 
+bottom of the free space in the overlay buffer. The next overlay unit 
+will be loaded here. The head of the overlay buffer.
+</td>
+</tr>
+</tbody><caption>Table 1 - Undocumented Identifiers</caption>
+</table>
+</div>
+
+
+<p>
+As you can see from table 1, we have some intriguing variables (actually
+ typed constants) to play with later on. Firstly, however, a basic 
+question. How <em>does</em> the overlay manager know when an overlaid routine gets called? Enter the unit stub block and the jump table.
+</p>
+<p>
+When your program gets linked, each of your hand-crafted overlaid units 
+gets put into the OVR file, and a `stub' is left in the EXE file itself,
+ one for each unit. This `stub' comprises the unit stub block (my term, I
+ haven't a clue what it's called at Borland) and its jump table. The 
+unit stub block is 32 bytes long and has the layout shown in Figure 1. 
+</p>
+<div class="codebackground">
+<pre>type
+  PUnitStubBlock = ^TUnitStubBlock;
+  TUnitStubBlock = record
+    usbInt3F     : word;     { Always $3FCD, the INT 3Fh instruction }
+    usbRetOfs    : word;     { Offest of first return address }
+    usbFileOfs   : longint;  { Offset of unit in overlay file }
+    usbCodeSize  : word;     { Unit's code size in bytes }
+    usbFixupSize : word;     { Size of fix-up data block in bytes }
+    usbEntries   : word;     { Number of entries in the jump table }
+    usbNextBlock : word;     { Locale of next stub block }
+    usbBufferSeg : word;     { Segment of unit in overlay buffer }
+    usbWasCalled : word;     { 1 if unit was called on probation }
+    usbNextLoad  : word;     { Locale of next stub block whose unit is loaded }
+    usbFiller    : array [1..5] of word;  { Unused (?) }
+  end;
+</pre>
+</div>
+<h6>
+Figure 1 - The unit stub block
+</h6>
+<p>
+Immediately following this stub block is a `jump' table. Each element of
+ this table is 5 bytes long, and there is one entry for each exported 
+routine from your overlaid unit. A call to a routine in an overlaid unit
+ will actually call the relevant jump table entry. The overlay manager 
+`notices' (exactly how is explained later!), and if the code for the 
+routine is not yet in the overlay buffer, the unit is loaded, and the 
+jump table adjusted to point to the code. Similarly, if the unit gets 
+moved in the overlay buffer, the jump table gets adjusted again. When 
+the unit gets overwritten (`removed' if you will), the jump table is 
+adjusted once more. And that's just the layman's version!
+</p>
+<h4>
+In at the deep end
+</h4>
+<p>
+Slightly more detail now. Each jump entry is initially set by the 
+compiler to an INT 3Fh instruction (2 bytes) followed by the routine's 
+offset in the unit (2 bytes) followed by a zero byte. Suppose a overlaid
+ routine gets called and there is nothing in the overlay buffer. As 
+mentioned before, the call goes to the start of the jump table entry for
+ the routine. The INT 3Fh gets executed and lo! the overlay manager gets
+ control (<code>OvrInit</code> installs it as the INT 3Fh interrupt handler). At this point the stack looks like Figure 2.
+</p>
+<div class="codebackground">
+<pre>Top of stack segment
+...
+...
+...
+Original Caller's return segment
+Original Caller's return offset
+Flags
+Return segment from the INT 3Fh
+Return offset from the INT 3Fh
+</pre>
+</div>
+<h6>
+Figure 2 - The stack the overlay manager sees
+</h6>
+<p>
+Excellent! The segment word of the return address is none other than the
+ segment of the unit stub block, the offset word points directly to the 
+routine's offset in the unit's code block. The overlay manager can now 
+work out the location of the unit in the overlay file (field <code>usbFileLoc</code>). The unit's code is loaded (together with the fixup data block) into the overlay buffer at <code>OvrHeapPtr</code>,
+ any fixups are done (and the fixup data block discarded), and the jump 
+table entries are all altered to 5-byte far JMPs (we now know the 
+segment address of the code in the buffer, and the offset was in the 
+jump table to begin with). <code>OvrHeapPtr</code> is altered to point 
+at the next segment in the overlay buffer. By manipulating the stack, 
+the overlay manager ends by transferring control to the newly loaded 
+routine. From now on, calls to this routine will meet with a far JMP 
+straight to the code, and the overlay manager will not know about nor 
+interrupt them.
+</p>
+<p>
+Easy-peasy, huh? However, it gets more complicated when units are about 
+to get discarded from the buffer. Let us ignore probation for the moment
+ and assume unit A has been in the overlay buffer for a while. Another 
+unit needs to be loaded and the overlay manager notices that unit A will
+ have to go (it's at the tail of the buffer). Now some of A's routines 
+may be active, ie they have made calls to other routines and are waiting
+ for these routines to return. The return addresses are on the stack. If
+ we remove the unit, these return addresses will be pointing in the 
+middle of some other code in the overlay buffer. The overlay manager 
+needs to fix the stack so that it gets control when these returns are 
+executed. To do this, it has to assume two things: (1) all RETs are far 
+(ie all routines run up to now have been compiled with the far model: 
+the return addresses will have segment and offset components), and (2) 
+all routines push BP (the stack frame pointer for their caller) as their
+ first action. Turbo Pascal does this automatically for you when you 
+declare procedures and functions as far; beware, however, if you do some
+ assembler programming.
+</p>
+<p>
+The overlay manager can now `walk' through the stack until it finds a 
+return address segment for the unit about to be overwritten. It saves 
+the corresponding return offset, and replaces the full return address 
+with the unit stub block segment, zero offset (ie the INT 3Fh 
+instruction in the stub block: ah ha, light dawns!). The saved offset is
+ placed in field <code>usbRetOfs</code>. The manager continues its walk,
+ and all other return addresses for the same unit will have only their 
+segment word changed, to point at the unit stub block (don't worry, they
+ are never executed in this half-and-half state). When the program 
+eventually executes a RET to a removed routine, the unit stub block will
+ get called instead. The INT 3Fh is executed, and the overlay manager 
+gets control. It notices that it was called due to a RET (the last word 
+on the stack will be a 2: think about it), loads the unit, and patiently
+ refixes all the unit's return addresses on the stack (ie all return 
+addresses that have a segment equal to the unit stub block). Finally, it
+ pushes the return address that should have been used (the segment is 
+the unit's new segment in the buffer, the offset was stored at <code>ubsRetOfs</code>) onto the stack, and issues a RETF.
+</p>
+<p>
+By now you should recognise that the stack fixing stuff gets done every 
+single time a unit gets loaded, or indeed every single time it gets 
+shuffled around the buffer. If the unit is in the buffer, its return 
+address segments in the stack point into the buffer, if not, they point 
+to the unit stub block. In fact, every time the overlay manager gets 
+called, it walks the stack and fixes the segments for any overlaid unit 
+it finds. Better safe than sorry.
+</p>
+<p>
+The probation scheme works in roughly the same way. When the overlay 
+manager notices that a unit has entered the probation area, its jump 
+table is altered to the INT 3Fh version. If the unit gets called on 
+probation, the <code>usbWasCalled</code> flag gets set and the jump 
+table altered to far JMPs once more. When the unit reaches the tail of 
+the buffer, the overlay manager notices the flag has been set, resets 
+it, moves the unit's code from the tail to the head of the buffer and 
+gives the unit another ride around.
+</p>
+<h4>
+Time to Interfere
+</h4>
+<p>
+The procedure in Figure 3 (<code>OvrTracker</code>) is a debug routine whose address you can install into <code>OvrDebugPtr</code>. <code>OvrTracker</code>
+ uses two unused fields at the end of each unit stub block to track 
+probation and load calls. As mentioned in Table 1, the debug procedure 
+must be far, with no parameters. On entry ES is the segment of the unit 
+stub block in question (BX is significant as well, it is the offset of 
+the routine to be called). We don't know explicitly (as far as I know) 
+whether the procedure was called due to a probation trap or a unit load,
+ just that it will get called as the last thing the overlay manger does 
+before returning to the main program. I've declared a single typed 
+constant (mimicking <code>OvrLoadCount</code>) to track the load calls. Install <code>OvrTracker</code>
+ immediately you've initialised the overlay manager, the manager's EMS 
+driver (if used), and have finished altering the overlay buffer size.
+</p>
+<div class="codebackground">
+<pre>procedure OvrTracker; far;
+  { OvrTracker gets called whenever the overlay  }
+  { manager is about to relinquish control.      }
+  { Install with the statement:                  }
+  {   OvrDebugPtr := @OvrTracker;                }
+
+  const
+    LoadCount : word = 0;  { Tracks OvrLoadCount }
+
+  var
+    StubBlock  : PUnitStubBlock;
+    RoutineOfs : word;
+
+  begin
+    { When called, ES is the segment of the unit }
+    { stub block, BX is the offset of the routine}
+    { in the unit itself.                        }
+    asm
+      xor AX, AX
+      mov StubBlock.Word[0], AX
+      mov StubBlock.Word[2], ES
+      mov RoutineOfs, BX
+    end;
+
+    { Increment the number of times StubBlock    }
+    { has been trapped.                          }
+    { The 5th filler word is used as a counter.  }
+    inc(StubBlock^.usbFiller[5]);
+
+    { If OvrLoadCount has changed, the unit used }
+    { by StubBlock has just been loaded.         }
+    { The 4th filler word is used as a load      }
+    {   counter.                                 }
+    if (OvrLoadCount &lt;&gt; LoadCount) then
+      begin
+        LoadCount := OvrLoadCount;
+        inc(StubBlock^.usbFiller[4]);
+      end;
+
+    { At this point, you may call another        }
+    { UNOVERLAID routine, and pass StubBlock and }
+    { RoutineOfs as parameters if needed.        }
+
+  end;
+</pre>
+</div>
+<h6>
+Figure 3 - The OvrTracker procedure
+</h6>
+<p>
+The code is small and easily understandable. One warning though: do <em>not</em>
+ put this procedure in an overlaid unit: the program will nose-dive at 
+Mach 2. At the end of the procedure is a comment showing where you could
+ place a call to another procedure, for example to dump the overlay 
+buffer map to disk or printer. Again, to be pedantic, do <em>not</em> put this called procedure in an overlaid unit, and <em>don't</em>
+ allow it to use any overlaid routines in its turn. Remember when this 
+procedure is called, the overlay manager is still active and it 
+definitely is not re-entrant.
+</p>
+<p>
+The procedure in Figure 4 (<code>OvrWalker</code>) enables you to walk 
+the unit stub block chains: both the full chain and the loaded units 
+chain (the overlay buffer map), its action dependent on a passed boolean
+ parameter. The former mode could be used in an exit procedure to dump 
+the usage of the overlaid units at the end of the program (especially if
+ you've installed <code>OvrTracker</code> as well). The latter mode could be called by <code>OvrTracker</code>
+ itself, to dump the overlay buffer map to disk every time the overlay 
+manager gets control. As an alternative, you could install it in your 
+own error handler from hell, to be called when a run-time error occurs 
+in the overlay buffer.
+</p>
+<div class="codebackground">
+<pre>function RealAddr(Locale : word) : PUnitStubBlock; near;
+  { RealAddr calculates the actual address of a  }
+  { PUnitStubBlock from a locale value           }
+  begin
+    { A locale of zero = the end of the chain    }
+    if (Locale = 0) then
+         RealAddr := nil
+    else RealAddr := Ptr(Locale + PrefixSeg + $10, 0);
+  end;
+
+procedure OvrWalker(FullList : boolean);
+  { OvrWalker walks through the full unit stub   }
+  { block list if FullList is true, otherwise it }
+  { walks through the list of loaded stub blocks.}
+  var
+    StubBlock  : PUnitStubBlock;
+
+  begin
+    { Get the first stub block in the chain }
+    if FullList then
+         StubBlock := RealAddr(OvrCodeList)
+    else StubBlock := RealAddr(OvrLoadList);
+
+    { Walk through the chain ... }
+    while (StubBlock &lt;&gt; nil) do
+      with StubBlock^ do
+        begin
+
+          { ...Process this stub block... }
+
+          { Get next stub block in the chain }
+          if FullList then
+               StubBlock := RealAddr(usbNextBlock)
+          else StubBlock := RealAddr(usbNextLoad);
+        end;
+  end;
+</pre>
+</div>
+<h6>
+Figure 4 - The OvrWalker procedure
+</h6>
+<p>
+The only problem with <code>OvrWalker</code> and the unit stub blocks is
+ that you've no real idea which unit they're talking about. Enter the 
+MAP file. If you compile your program with the TPC compiler and use 
+switch /GS, you'll create a MAP file showing all the segments in your 
+program: code, data, stack, and heap. Each line in this MAP file shows 
+the start and end segment values (locales in my parlance), the size in 
+bytes, the name and class of each segment. If you walk through the unit 
+stub blocks with <code>OvrWalker</code>, their locales can be matched to
+ the start locales in the MAP file. The best thing to do would be to 
+simply dump the unit stub blocks to a file from within your program, and
+ then write an analysis program to operate on this file. By reading and 
+parsing the MAP file first, the analysis program could easily attach 
+meaningful unit names to each of the stub blocks. In Figure 5, I show 
+the code for a unit (with no error checking for brevity's sake) that 
+initialises the overlay manager, installs <code>OvrTracker</code>, and, on program termination, uses the MAP file to produce a simple usage dump of the overlaid units.
+</p>
+<div class="codebackground">
+<pre>UNIT OvrUsage;
+
+{$O-} { No overlays allowed here }
+
+INTERFACE
+
+uses Overlay;
+
+IMPLEMENTATION
+
+type
+  PUnitStubBlock = ^TUnitStubBlock;
+  TUnitStubBlock = record
+    usbInt3F     : word;
+    usbRetOfs    : word;
+    usbFileOfs   : longint;
+    usbCodeSize  : word;
+    usbFixupSize : word;
+    usbEntries   : word;
+    usbNextBlock : word;
+    usbBufferSeg : word;
+    usbWasCalled : word;
+    usbNextLoad  : word;
+    usbFiller    : array [1..3] of word;
+    usbOurLoads  : word; { 4th filler - redefined }
+    usbOurTraps  : word; { 5th filler - redefined }
+  end;
+
+{ The saved previous exit procedure }
+var
+  ExitSave : pointer;
+
+{ Procedure OvrTracker is the essentially the }
+{ same as that in Figure 2; we don't want the }
+{ routine offset this time however.           }
+procedure OvrTracker; far;
+  const
+    LoadCount : word = 0;
+  var
+    StubBlock  : PUnitStubBlock;
+  begin
+    asm
+      xor AX, AX
+      mov StubBlock.Word[0], AX
+      mov StubBlock.Word[2], ES
+    end;
+    inc(StubBlock^.usbOurTraps);
+    if (OvrLoadCount &lt;&gt; LoadCount) then
+      begin
+        LoadCount := OvrLoadCount;
+        inc(StubBlock^.usbOurLoads);
+      end;
+  end;
+
+{ RealAddr calculates the actual address of a }
+{ PUnitStubBlock from a locale value          }
+function RealAddr(Locale : word) : PUnitStubBlock; near;
+  begin
+    { A locale of zero signifies the end of a chain }
+    if (Locale = 0) then
+         RealAddr := nil
+    else RealAddr := Ptr(Locale + PrefixSeg + $10, 0);
+  end;
+
+
+{ Procedure ReportUsage is designed as an exit }
+{ procedure. It reads the MAP file to get the  }
+{ unit names, and then dumps the unit usage    }
+{ statistics to file OVERLAY.DMP.              }
+{ WARNING - contains NO error checking.        }
+procedure ReportUsage; far;
+  const
+    MaxUnits = 100; { The max no of units we cater for }
+  type
+    UnitName = record { To store data for each unit }
+      Locale : word;
+      Name   : string[8];
+    end;
+  var
+    i, ec       : integer;
+    StubBlock   : PUnitStubBlock;
+    StubLocale  : word;
+    F           : text;
+    MapFileName : string;
+    Line        : string absolute MapFileName;
+    NameArray   : array [1..MaxUnits] of UnitName;
+    Finished    : boolean;
+  begin
+    ExitProc := ExitSave;
+
+    { Assume we're running under MSDOS 3.0+, and }
+    { the MAP file name is the same as the EXE   }
+    { file name with a '.MAP' extension.         }
+    MapFileName := ParamStr(0);
+    MapFileName[0] := char(Pos('.', MapFileName) - 1);
+    MapFileName := MapFileName + '.OVR';
+
+    { Open the MAP file }
+    Assign(F, MapFileName);
+    Reset(F);
+
+    { Miss the first three lines (the headings) }
+    for i := 1 to 3 do readln(F, Line);
+
+    { Read through the MAP file until we get to  }
+    { the the line for the heap. For each line   }
+    { read, get the start locale and unit name   }
+    { and store in the local array NameArray.    }
+    i := 0; Finished := false;
+    repeat
+      readln(F, Line);
+      inc(i);
+      with NameArray[i] do
+        begin
+          Line[1] := '$';
+          Val(Copy(Line, 1, 5), Locale, ec);
+          Name := Copy(Line, 23, 8);
+          if (Name = 'HEAP    ') then Finished := true;
+        end;
+    until Finished;
+    Close(F);
+
+    { Open the statistics file OVERLAY.DMP, }
+    { output the headings.                  }
+    Assign(F, 'OVERLAY.DMP');
+    Rewrite(F);
+    writeln(F, 'Overlay usage for ', ParamStr(0));
+    writeln(F);
+    writeln(F, 'Name----  -Size  Traps  Loads');
+
+    { Now walk the unit stub block chain }
+    StubBlock := RealAddr(OvrCodeList);
+    StubLocale := OvrCodeList;
+    while (StubBlock &lt;&gt; nil) do
+      with StubBlock^ do
+        begin
+          { Find the unit name }
+          i := 0;
+          while (NameArray[i].Locale &lt;&gt; StubLocale) do inc(i);
+
+          { Write details to the Usage file }
+          writeln(F, NameArray[i].Name,
+                     usbCodeSize:7,
+                     usbOurTraps:7,
+                     usbOurLoads:7);
+
+          { Get next stub block in the chain }
+          StubBlock := RealAddr(usbNextBlock);
+          StubLocale := usbNextBlock;
+        end;
+    Close(F);
+  end;
+
+var
+  OvrFileName : string;
+
+begin
+  { Assume we're running under MSDOS 3.0+, and   }
+  { the overlay file name is the same as the EXE }
+  { file name with a '.OVR' extension.           }
+  OvrFileName := ParamStr(0);
+  OvrFileName[0] := char(Pos('.', OvrFileName) - 1);
+  OvrFileName := OvrFileName + '.OVR';
+
+  { Initialise the overlay manager, with a buffer}
+  { twice the size of the original. Set the      }
+  { probation area.                              }
+  OvrInit(OvrFileName);
+  OvrSetBuf(OvrGetBuf * 2);
+  OvrSetRetry(OvrGetBuf div 3);
+
+  { Install OvrTracker. }
+  OvrDebugPtr := @OvrTracker;
+
+  { Install the ReportUsage routine as an exit }
+  { procedure.                                 }
+  ExitSave := ExitProc;
+  ExitProc := @ReportUsage;
+end.
+</pre>
+</div>
+<h6>
+Figure 5 - An example Overlay Usage unit
+</h6>
+<h4>
+Conclusion
+</h4>
+<p>
+As I have shown, the Turbo Pascal overlay manager is extremely 
+sophisticated, both from an external viewpoint and also from watching 
+its internal machinations.
+</p>
+<p>
+From the undocumented features I have laid bare, you can now find out 
+how best to use overlaid units, which ones to overlay, and conversely, 
+which ones not to. You can find out by observing your own program 
+whether the recommended probation size (one third of the overlay buffer)
+ is the best for you. You can decide whether to split up large overlaid 
+units or not.
+If you're feeling adventurous, you could investigate how to move the 
+overlay buffer, how to shrink it, and (harder) how to grow it 
+dynamically, as your program relaxes and intensifies its demands on the 
+heap. Perhaps, like me, you could write your own unit to load overlaid 
+units from XMS rather than EMS, disable the 64KB EMS page frame, and 
+reuse the memory for something else (the overlay buffer?).
+</p>
+<p>
+<cite>
+Julian Bucknall has been designing and programming for 12 years, and 
+full time in Turbo Pascal for the last three. His other favourite 
+language used to be RPG III, so there's no hope. Off work, he can be 
+found at the wheel of his red Volvo 1800S in and around London, a 
+Saintly vision.
+</cite>
+</p>
+<p>
+The quote is from the poem Jabberwocky, in <cite>Alice Through the Looking Glass</cite> by Lewis Carroll.
+</p>
+<p>
+Turbo Pascal V6.0 Professional is a product from Borland International 
+(0734 321150), and is available at £137 from Grey Matter (0364 53499).
+</p>
+
+
+          <!-- Finish Main Content -->
+          </div>    
+        </div>
+      </div> <!-- #main -->
+    </div> <!-- #main-container -->
+
+
+
+   </body></html>

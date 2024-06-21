@@ -1,0 +1,671 @@
+https://groups.google.com/g/comp.os.msdos.programmer/c/wEZRt_RZbJY
+________________________________________________
+
+>Turbo C/C++ Overlays?
+>How do I create them? How do I use them?
+
+You set them up with compiler and linker
+switches, but once the exe is compiled and linked it is automatic. the
+"Programmers guide", chapter 4 has the details, in my old version of
+Turbo c++.
+
+You really need to read the manual, and understand the limitations, and
+how to set it up.
+
+Use the medium, large or huge mem model
+
+Compiler options
+all modules -y
+modules that can be overlayed -yo
+
+linker /o
+
+don't over lay interrupt routines, or small frequently used routines, or
+any time critical routines.
+
+the global
+unsigned _ovrbuffer = 0x2000;
+
+sets the overlay size. If not set the default is twice the size of the
+largest swappable segment.
+
+Swapping using xms or ems can be enabled with calls to _OvrinitEms or
+_OvrinitExt
+
+
+
+
+Different Borland Overlay Implementations
+________________________________________________
+
+
+There are actually multiple overlay libraries, including several for Borland
+products. Most work through an overlay stack, pushing a popping overlays,
+as the call progress.
+
+One of them is OVERMGR.TPU by Turbopower Software
+https://en.wikipedia.org/wiki/Turbo_Pascal#Version_2
+Turbopower Software ... produced ... Overlay Manager for Turbo Pascal. 
+
+The OVERMGR.TPU copy was preserved at a Russian site:
+https://pascal.sources.ru/comm/pibter41.htm
+
+But it doesn't share code with the FBOV/VROOM we are dealing with.
+
+The Borland Turbo Pascal 5.0 overlay manger appears to be the same FBOV format
+Borland Pascal 7.01 comes with the standard library source code.
+Among other things it has RTL/INC/SE.ASM, which enumerates the following
+struct fields:
+
+  ; Overlay header record
+
+  ovSignature     equ     (word ptr 0)
+  ovSaveReturn    equ     (word ptr 2)
+  ovFilePos       equ     (dword ptr 4)
+  ovCodeSize      equ     (word ptr 8)
+  ovFixupSize     equ     (word ptr 10)
+  ovJumpCount     equ     (word ptr 12)
+  ovLink          equ     (word ptr 14)
+  ovSegment       equ     (word ptr 16)
+  ovRetryCount    equ     (word ptr 18)
+  ovNext          equ     (word ptr 20)
+  ovEmsPage       equ     (word ptr 22)
+  ovEmsOffset     equ     (word ptr 24)
+  ovUserData      equ     (byte ptr 26)
+  ovVectors       equ     (byte ptr 32)
+  ovRecSize       equ     32
+
+When the program gets linked, the code from the overlaid objs end in
+an FBOV file (these had .OVR extension on disk).
+The linker creates a table of `int 3Fh` function thunks, on for each of the
+external function in that OBJ. Then everything is linked against these thunks,
+instead of actual OBJ functions. On call such thunk incurs load of
+the associated overlay and increment to ovRetryCount.
+Once ovRetryCount gets enough calls, the overlay gets moved to frequently used
+are and all `int 3Fh` get replaced by jmps.
+
+
+
+IDA DOS loader
+________________________________________________
+
+#define FB_MAGIC 0x4246
+#define OV_MAGIC 0x564F 
+struct fbov_t
+{
+	ushort fb;	// = FB_MAGIC
+	ushort ov;	// = OV_MAGIC
+	uint32 ovrsize;
+	uint32 exeinfo;
+	int32 segnum;
+};
+
+
+IDA DOS loader
+Having unpacked executable is a good start, but having proper disassembly is way more important. Unfortunately IDA had hard times loading this executable. It properly detects overlay, but fails at loading it. After quick look at the code, it turned out that analysis without overlay would be rather painful, as there are obviously missing parts in the code (even though decompression routine is stored inside the executable). I had to take another look at IDA DOS loader and maybe figure out how to load this overlay. Querying google for “FBOV” dos overlay brings source code of IDA DOS loader as a first result, which confirms that IDA should properly load this type of overlay. I’ve recompiled debug version of IDA DOS loader, and traced it in Visual Studio to see why it fails. To understand where the problem was, I need to describe a few internals of FBOV structure. FBOV header is described by below structure:
+
+#define FB_MAGIC 0x4246
+#define OV_MAGIC 0x564F
+ 
+struct fbov_t
+{
+	ushort fb;	// = FB_MAGIC
+	ushort ov;	// = OV_MAGIC
+	uint32 ovrsize;
+	uint32 exeinfo;
+	int32 segnum;
+};
+
+exeinfo is an offset (absolute to the beginning of the MZ header) to the array of structures that describes each segment stored in the overlay. segnum is the number of segments, which are described by below structure:
+
+struct seginfo_t
+{
+	ushort seg;
+	ushort maxoff;
+	ushort flags;
+	ushort minoff;
+};
+
+That’s the theory and IDA DOS loader implements it in the LoadCppOverlays() function. In case of this executable, this theory fails, but it fails only by a “few” bytes. During debugging session I’ve figured out that exeinfo points to the place just after mentioned array of segments. I’ve added one line to LoadCppOverlays():
+
+	fbov.exeinfo -= fbov.segnum*sizeof(seginfo_t);
+
+This simple fix enabled IDA to properly load overlay data and analyse whole executable. I haven’t found any FBOV documentation (neither official, nor unofficial), so I can’t confirm if there are multiple different implementations of FBOV overlays. I’m rather sure that IDA DOS loader implements proper version, as someone who wrote it probably based it on some real life examples. Maybe MM3 difference stems from some unpacking quirks, who knows.
+
+
+IDA issues
+________________________________________________
+
+
+https://github.com/NationalSecurityAgency/ghidra/issues/5543
+
+It would be nice to get support for the "FBOV" overlay extension for MZ EXEs. Also known as "VROOMM" (Virtual Run-time Object-Oriented Memory Manager), this was a feature provided by the Borland C/C++ toolchain from v2.0. It allowed for dynamic swapping of code segments to get around the 640K memory barrier. This approach was popular only briefly, as extenders such as DOS/4G soon became available. A section in Chapter 1 of the Borland C++ 4.0 reference manual describes the general design of VROOMM.
+
+I've attached a sample executable in this ZIP file: nomad.zip
+The .exe can be loaded by the existing Ghidra MZ loader, but with the following message:
+File contains 0x29390 extra bytes starting at file offset 0x3e9c0.
+
+This extra data is actually the entire FBOV section from the file, which starts with this header:
+
+char[4] fbovMagic; // always "FBOV" -- should be used for detection
+uint32 ovrsize;
+uint32 exeinfo;
+int32 segnum;
+
+In the sample file, ovrsize is the size in bytes of the FBOV section excluding its header (0x29380). The segnum field is the total number of segments known to the overlay mechanism (0xa5). These segments are described by an array of structs at the file offset given by the exeinfo field. Borland gives this array the internal name _SEGTABLE_ in OVERLAY.LIB. In the sample, _SEGTABLE_ starts at 0x2e100 (which is actually in the middle of a segment containing the other VROOMM data.)
+
+Each entry in _SEGTABLE_ is an 8-byte structure:
+
+uint16 seg;
+uint16 maxoff;
+uint16 flags;
+uint16 minoff;
+
+The first few entries in the segment table of nomad.exe are:
+
+  0, 21e2, 1, 0
+21e, 5214, 1, 4  // loaded by IDA as seg001
+73f, 1043, 1, 4  // loaded by IDA as seg002
+843, ba,   1, 4  // loaded by IDA as seg003
+84e, cb2,  1, a  // loaded by IDA as seg004
+
+IDA Freeware 5.0 supports MZ/FBOV and can be used as a reference for desired behavior. In the case of nomad.exe, the code from the 0x29380 extra bytes at the end of the file is divided into overlay segments ovr075 through ovr153
+
+
+
+
+
+Overlays (VROOMM) for DOS 
+________________________________________________
+
+Overlays are used only in 16-bit DOS programs; you can mark the code 
+segments of a Windows application as discardable to decrease memory 
+consumption. Overlays are parts of a program's code that share a common 
+memory area. Only the parts of the program that are required for a given 
+function reside in memory at the same time. See Chapter 9 in the User's 
+Guide. 
+
+Overlays can significantly reduce a program's total run-time memory 
+requirements. With overlays, you can execute programs that are much 
+larger than the total available memory, since only parts of the program 
+reside in memory at any given time.
+
+Borland C++'s overlay manager (called VROOMM for Virtual Run-time 
+Object-Oriented Memory Manager) is highly sophisticated; it does much of 
+the work for you. In a conventional overlay system, modules are grouped 
+together into a base and a set of overlay units. Routines in a given overlay
+unit can call other routines in the same unit and routines in the base, but 
+not routines in other units. The overlay units are overlaid against each 
+other; that is, only one overlay unit can be in memory at a time, and each 
+unit occupies the same physical memory. The total amount of memory 
+needed to run the program is the size of the base plus the size of the largest 
+overlay. 
+
+This conventional scheme is quite inflexible. It requires complete under
+standing of the possible calling dependencies in the program, and requires 
+you to have the overlays grouped accordingly. It might be impossible to 
+break your program into overlays if you can't split it into separable calling 
+dependencies. 
+
+VROOMM's scheme is quite different. It provides dynamic segment swapping. 
+The basic swapping unit is the segment. A segment can be one or more 
+modules. More importantly, any segment can call any other segment. 
+
+Memory is divided into an area for the base plus a swap area. Whenever a 
+function is called in a segment that is neither in the base nor in the swap 
+area, the segment containing the called function is brought into the swap 
+area, possibly displacing other segments. This is a powerful approach-it is 
+like software virtual memory. You no longer have to break your code into 
+static, distinct, overlay units. You just let it run! 
+
+Suppose a segment needs to be brought into the swap area. If there is room 
+for the segment, execution continues. If there is not, then one or more 
+segments in the swap area must be thrown out to make room. 
+
+The algorithm for deciding which segment to throw out is quite sophisti
+cated. Here's a simplified version: if there is an inactive segment, choose it 
+for removal. Inactive segments are those without executing functions. 
+Otherwise, pick an active segment and swap it out. Keep swapping out 
+segments until there is enough room available. This technique is called 
+dynamic swapping. 
+
+The more memory you provide for the swap area, the better the program 
+performs. The swap area acts like a cache; the bigger the cache, the faster 
+the program runs. The best setting for the size of the swap area is the size of 
+the program's working set. 
+
+Once an overlay is loaded into memory" it is placed in the overlay buffer, 
+which resides in memory between the stack segment and the far heap. By 
+default, the size of the overlay buffer is estimated and set at startup, but 
+you can change it using the global variable _ovrbuffer (see Appendix B). If 
+there isn't enough available memory, an error message is displayed by DOS 
+("Program too big to fit in memory") or by the C startup code ("Not 
+enough memory to run program").
+
+One important option of the overlay manager is the ability to swap the 
+modules to expanded or extended memory when they are discarded from 
+the overlay buffer. Next time the module is needed, the overlay manager 
+can copy it from where the module was swapped to instead of reading 
+from the file. This makes the overlay manager much faster. 
+
+When using overlays, memory is used as shown in the next figure. 
+
+
+To get the best out of Borland C++ overlays,
+* Minimize resident code (resident run-time library, interrupt handlers, 
+  and device drivers are a good starting point).
+* Set overlay buffer size to be a comfortable working set (start with 128K 
+  and adjust up and down to see the speed/ size tradeoff). 
+* Think versatility and variety: take advantage of the overlay system to 
+  provide support for special cases, interactive help, and other end-user 
+  benefits you couldn't consider before.
+
+To create overlays, you'll need to remember a few rules: 
+* The smallest part of a program that can be made into an overlay is a 
+  segment.
+* Overlaid applications must use the medium, large, or huge programming 
+  models; the tiny, small, and compact models are not supported. 
+* Normal segment merging rules govern overlaid segments. That is, 
+  several .OBJ modules can contribute to the same overlaid segment. 
+  The link-time generation of overlays is completely separated from the run
+  time overlay management; the linker does not automatically include code to 
+  manage the overlays. In fact, from the linker's point of view, the overlay 
+  manager is just another piece of code that gets linked in. The only assump
+  tion the linker makes is that the overlay manager takes over an interrupt 
+  vector (typically INT 3FH) through which all dynamic loading is con
+  trolled. This level of transparency makes it very easy to implement 
+  custom-built overlay managers that suit the particular needs of each 
+  application.
+
+
+If you overlay a C++ program that contains exception-handling constructs, 
+there are a number of situations that you must avoid. The following 
+program elements cannot contain an exception-handling construct: 
+* Inline functions that are not expanded inline 
+* Template functions 
+* Member functions of template classes 
+
+Exception-handling constructs include user-written try/catch and 
+__try/__except blocks. In addition, the compiler can insert exception 
+handlers for blocks with automatic class variables, exception specifications, 
+and some new / delete expressions. 
+
+If you attempt to overlay any of the above exception-handling constructs, 
+the linker identifies the function and module with the following message: 
+
+  Error: Illegal local public in function_name in module module_name 
+
+When this error is caused by an inline function, you can rewrite the 
+function so that it is not inline. If the error is caused by a template function, 
+you can do the following: 
+* Remove all exception-handling constructs from the function 
+* Remove the function from the overlay module 
+
+You need to pay special attention when overlaying a program that uses 
+multiple inheritance. An attempt to overlay a module that defines or uses 
+class constructors or destructors that are required for a multiple inheritance 
+class can cause the linker to generate the following message: 
+
+  Error: Illegal local public in class_name:: in module module_name
+
+
+When such a message is generated, the module identified by the linker 
+message should not be overlaid. 
+The container classes (in the BIDS? .LIB) have the exception-handling 
+mechanism turned off by default. However, the diagnostic version of BIDS 
+throws exceptions and should not be used with overlays. By default, the 
+string class can throw exceptions and should not be used in programs that 
+use overlays. See the Library Reference for a discussion of BIDS and the 
+string class.
+
+To overlay a program, all of its modules must be compiled with the-Y 
+compiler option enabled. To make a particular module into an overlay, it 
+needs to be compiled with the -Yo option. (-Yo automatically enables -Y.) 
+
+The -Yo option applies to all modules and libraries that follow it on the 
+command line; you can disable it with -Yo-. These are the only command 
+line options that are allowed to follow file names. For example, to overlay 
+the module OVL.C but not the library GRAPHICS.LIB, either of the 
+following command lines could be used: 
+
+  BCC -ml -Yo ovl.c -Yo- graphics.lib 
+or 
+  BCC -ml graphics.lib -Yo ovl.c 
+
+If TLINK is invoked explicitly to link the .EXE file, the b linker option must 
+be specified·on the linker command line or response file. See Chapter 9 in 
+the User's Guide for details on how to use the b option. 
+
+Suppose that you want to overlay a program consisting of three modules: 
+MAIN.C, Ol.C, and 02.C. Only the modules Ol.C and 02.C should be 
+made into overlays. (MAIN.C contains time-critical routines and interrupt 
+handlers, so it should stay resident.) Let's assume that the program uses the 
+large memory model. 
+
+The following command accomplishes the task: 
+  BCC -ml -Y main.c -Yo ol.c o2.c 
+
+The result will be an executable file MAIN.EXE, containing two overlays.
+
+This section discusses issues vital to well-behaved overlaid applications. 
+
+Use a large code model (medium, large, or huge) when you want to 
+compile an overlay module. At any call to an overlaid function in another 
+module, you must guarantee that all currently active functions are far. 
+
+You must compile all overlaid modules with the -v option, which makes 
+the compiler generate code that can be overlaid. 
+
+Failing to observe the far call requirement in an overlaid program will 
+cause unpredictable and possibly catastrophic results when the program is 
+executed.
+
+
+The default overlay buffer size is twice the size of the largest overlay. This 
+is adequate for some applications. But imagine that a particular function of 
+a program is implemented through many modules, each of which is 
+overlaid. If the total size of those modules is larger than the overlay buffer, 
+a substantial amount of swapping will occur if the modules make frequent 
+calls to each other. 
+
+The solution is to increase the size of the overlay buffer so that enough 
+memory is available at any given time to contain all overlays that make 
+frequent calls to each other. You can do this by setting the _ovrbuffer global 
+variable (see Appendix B) to the required size in paragraphs. For example, 
+to set the overlay buffer to 128K, include the following statement in your 
+code: 
+
+  unsigned _ovrbuffer = Ox2000; 
+
+There is no general formula for determining the ideal overlay buffer size. 
+Exception-handlmg constructs in overlays require special attention. See 
+page 23 for a discussion of exception handling. 
+
+Don't overlay modules that contain interrupt handlers, or small and time
+critical routines. Due to the non-reentrant nature of the DOS operating 
+system, modules that might be called by interrupt functions should not be 
+overlaid. 
+
+Borland C++'s overlay manager fully supports passing overlaid functions 
+as arguments, assigning and initializing function pointer variables with 
+addresses of overlaid functions, and calling overlaid routines via function 
+pointers.
+
+Most debuggers have very limited overlay debugging capabilities, if any at 
+all. Not so with Borland C++'s Turbo Debugger, the standalone debugger. 
+The debugger fully supports single-stepping and breakpoints in overlays in 
+a manner completely transparent to you. By using overlays, you can easily 
+engineer and debug huge applications-all by using Turbo Debugger. 
+
+Like normal C functions, external assembly language routines must 
+observe certain programming rules to work correctly with the overlay 
+manager. 
+
+If an assembly language routine makes calls to any overlaid functions, the 
+assembly language routine must be declared FAR, and it must set up a stack 
+frame using the BP register. For example, assuming that OtherFunc is an 
+overlaid function in another module, and that the assembly language 
+routine ExternFunc calls it, then ExternFunc must be FAR and set up a stack 
+ExternFunc   PROC   FAR
+  push   bp
+  mov    bp,sp
+  sub    sp,LocalSize
+  ...
+  call   OtherFunc  ;Call another overlaid module
+  ...
+  mov    sp,bp
+  pop    bp
+  RET 
+ExternFunc    ENDP
+
+
+where LocalSize is the size of the local variables. If LocalSize is zero, you can 
+omit the two lines to allocate and dispose local variables, but you must not 
+omit setting up the BP stack frame even if you have no arguments or 
+variables on the stack. 
+
+These requirements are the same if ExternFunc makes indirect references to 
+overlaid functions. For example, if OtherFunc makes calls to overlaid 
+functions, but is not itself overlaid, ExternFunc must be FAR and still has to 
+set up a stack frame. 
+
+In the case where an assembly language routine doesn't make any direct or 
+indirect references to overlaid functions, there are no special requirements; 
+the assembly language routine can be declared NEAR. It does not have to 
+set up a stack frame. 
+
+Overlaid assembly language routines should not create variables in the 
+code segment, since any modifications made to an overlaid code segment
+are lost when the overlay is disposed. Likewise, pointers to objects based in 
+an overlaid code segment cannot be expected to remain valid across calls to 
+other overlays, since the overlay manager freely moves around and 
+disposes overlaid code segments. 
+
+If you have expanded or extended memory available, you can tell the 
+overlay manager to use it for swapping. If you do so, when the overlay 
+manager has to discard a module from the overlay buffer (because it should 
+load a new module and the buffer is full), it can store the discarded module 
+in this memory. Any later loading of this module is reduced to in-memory 
+transfer, which is significantly faster than reading from a disk file. 
+
+In both cases there are two possibilities: the overlay manager can either 
+detect the presence of expanded or extended memory and can take it over 
+by itself, or it can use an already detected and allocated portion of memory. 
+For extended memory, the detection of the memory use is not always 
+successful because of the many different cache and RAM disk programs 
+that can take over extended memory without any mark. To avoid this 
+problem, you can tell the overlay manager the starting address of the 
+extended memory and how much of it is safe to use. 
+
+Borland C++ provides two functions that allow you to initialize expanded 
+and extended memory. See Chapter 5 for a description of the _OvrInitEms 
+and _OvrrInitExt functions.
+
+
+README
+________________________________________________________________________________
+To improve performance, increase the size of the global 
+         variable __ovrbuffer to 0x2000 or greater.
+
+
+Overlay interrupt
+________________________________________________________________________________
+
+From TLINK.TXT
+
+/o 16-bit Overlays modules or libraries.
+
+/o (overlays) overlays code in all the modules or libraries that
+follow the option on the command line (this option works for DOS
+applications only). Use /o- on the command line to turn off overlays.
+If you specify a class name after this option, all the segments in
+that class are overlaid (you can do this for multiple classes). If you
+don't specify any name after this option, all segments of classes
+ending with CODE are overlaid. This option uses the default overlay
+interrupt number of 3FH. To specify a different interrupt number, use
+/o#xx, where xx is a two-digit hexadecimal number.
+
+
+Overlay related compilation errors
+________________________________________________________________________________
+Overlays generated and no overlay manager included [Linker warning] 
+This warning is issued if overlays are created but the symbol __OVRTRAP__ is
+not defined in any of the object modules or libraries linked in.
+The standard overlay library (OVERLAY.L1B) defines this symbol. 
+
+Overlays only supported in medium, large, and huge memory models[Compiler error]
+Only programs using the medium, large, or huge memory models can be overlaid. 
+
+Program entry point may not reside in an overlay [Linker error]
+Although almost all of an application can be overlaid,
+the initial starting address cannot reside in an overlay.
+This error usually  means that an attempt was made to overlay
+the initialization module (COx.OBJ, for instance) by specifying
+the /0 option before the startup module.
+
+Group group1 overlaps group group2 [Linker warning]
+This means that TLiNK has encountered nested groups.
+This warning occurs only when overlays are used. 
+
+No stub for fixup at address  [Linker warning]
+This error occurs when the target for a fixup is in an overlay segment,
+but no stub is found for a target external.
+This is usually the result of not making public a symbol in
+an overlay that is referenced from the same module. 
+
+
+
+_ovrbuffer
+________________________________________________________________________________
+Function:  Change the size of the overlay buffer.
+Syntax:    unsigned _ovrbuffer = size;
+Declared:  in dos.h
+
+Remarks:
+The default overlay buffer size is twice the size of the largest over-
+lay. This is adequate for some applications. But imagine that a
+particular function of a program is implemented through many
+modules, each of which is overlaid. If the total size of those
+modules is larger than the overlay buffer, a substantial amount of
+swapping will occur if the modules make frequent calls to each
+other.
+
+The solution is to increase the size of the overlay buffer so that
+enough memory is available at any given time to contain all
+overlays that make frequent calls to each other. You can do this by
+setting the _ovrbuffer global variable to the required size in para-
+graphs. For example, to set the overlay buffer to 128K, include the
+following statement in your code:
+
+  unsigned _ovrbuffer = Ox200
+
+There is no general formula for determining the ideal overlay buffer size.
+
+
+
+_OvrPrepare
+________________________________________________________________________________
+Function:  Prepare overlay manager.
+
+Remarks:
+Called by c0.obj's StartExit code, run before the main() invocation.
+
+
+
+
+_OvrInitEms
+Function:  Initializes expanded memory swapping for the overlay manager.
+Syntax:    #include <dos.h>
+           int cdecl far _OvrInitEms(unsigned emsHandle, unsigned firstPage,
+                                     unsigned pages);
+Prototype: in dos.h
+Remarks:
+_OvrInitEms checks for the presence of expanded memory by looking for
+an EMS driver and allocating memory from it. If emsHandle is zero, the
+overlay manager allocates EMS pages and uses them for swapping. If
+emsHandle is not zero, then it should be a valid EMS handle; the overlay
+manager will use it for swapping. In that case, you can specify firstPage,
+where the swapping can start inside that area.
+In both cases, a nonzero pages parameter gives the limit of the usable
+pages by the overlay manager.
+Return value _OvrInitEms returns 0 if the overlay manager is able to use expanded
+memory for swapping.
+Portability _OvrInitEms is unique to Borland C++.
+
+Example:
+#include <dos.h>
+int main(void)
+{
+  /* ask overlay manager to check for expanded memory and allow it to use 16
+     pages (256K) available only in medium, large, and huge memory models */
+  _OvrInitEms (0, 0, 16);
+  return 0;
+}
+
+
+_OvrInitExt
+________________________________________________________________________________
+Function: Initializes extended memory swapping for the overlay manager.
+Syntax:  #include <dos.h>
+         int cdecl far _OvrInitExt(unsigned long startAddress,
+                                   unsigned long length);
+Prototype: in dos.h
+Remarks:
+_OvrInitExt checks for the presence of extended memory, using the known
+methods to detect the presence of other programs using extended mem-
+ory, and allocates memory from it. If startAddress is zero, the overlay
+manager determines the start address and uses, at most, the size of the
+overlays. If startAddress is not zero, then the overlay manager uses the
+extended memory above that address.
+In both cases, a nonzero length parameter gives the limit of the usable
+extended memory by the overlay manager.
+Return value _OvrInitExt returns 0 if the overlay manager is able to use extended
+memory for swapping.
+Portability _OvrInitExt is unique to Borland C++.
+
+Example #include <dos. h>
+int main (void)
+{
+  /* use the extended memory from the linear address Ox200000L (2MB), as much as
+     necessary */
+  _OvrInitExt (Ox200000L, 0);
+  return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+BOA 4.0: Debugging Turbo Pascal overlays
+
+  void  far *debugger_hook; /* A far ptr into debugged */
+                            /* program,  meaning depends */
+                            /* on program flags. For pascal */
+                            /* overlays,  is ptr to start of */
+                            /* data area  that contains info */
+                            /* contains  about the overlays. */
+
+Data at address pointed to by debugger_hook:
+
+  typedef struct
+  {
+    unsigned short overlay_list;  /* start of linked list of overlay */
+                                  /* header segs  */
+    unsigned short overlay_size;  /* smallest  overlay buffer that   */
+                                  /* can be used */
+    void far *  debugger_hook;    /* ptr to routine in debugger      */
+  } overlay;
+
+
+
+A debugger must fill in debugger_hook after
+loading the program. debugger_hook is called by
+the overlay manager after any overlay is loaded.
+The  allows the debugger to set  in the newly
+loaded segment. When called, ES contains the base
+segment of the overlay header BX contains the
+offset that the overlay manager will jump to in
+the newly loaded code. (This is useful if an int
+3F has been traced--an int 3f is followed by data
+and is not returned.)
+
+
+The actual segment of a particular overlaid
+segment is at offset 10h in the overlay header.
+If this value is zero, then the segment is not
+loaded.
+
+Data objects in an overlaid segment will contain
+the segment of the overlay header and the true
+offset in the code segment.
+
+
+
